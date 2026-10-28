@@ -19,6 +19,14 @@ MAP = {
     "палец смерти": "finger", "паучок бруды": "spider", "робот": "robot", "рошан": "roshan",
     "снайпер": "sniper", "тайдхантер": "tide", "танго": "tango", "тараска": "heart",
     "течис": "techies", "том знаний": "tome", "фантом ассасин": "phantom",
+    "рики": "riki", "веномансер": "venomancer", "лайфстилер": "lifestealer", "буря молота": "stormhammer",
+    "мкб": "mkb", "дезолятор": "deso", "батлфьюри": "battlefury", "рапира": "rapier",
+    "способность рошана": "power_roshanboss",
+    "Рики": "riki", "Веномастер": "venomancer", "Лайфстиллер": "lifestealer", "Буря молота": "stormhammer",
+    "монкей кинг бар": "mkb", "Дезолятор": "deso", "Батлфьюри": "battlefury",
+    "Шадоурейз": "ult_sf", "Сан Страй": "ult_invoker", "Ульта Пуджа": "ult_pudge", "Ребут": "ult_tinker",
+    "Землятрясение Рошана": "ult_roshanboss", "Ульта Лизы": "ult_liza",
+    "Руна дд": "rune_dd", "Руна реген": "rune_regen", "Руна ускорения": "rune_haste", "Руна богатства": "rune_bounty",
 }
 
 

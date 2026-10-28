@@ -208,7 +208,7 @@ svg.map { filter: saturate(.6) brightness(.7); }
 :is(.card, .minion, .portrait, .power).selected { --glow: var(--select); }
 
 /* ---------- Boards and minions ---------- */
-.board { flex: 1; position: relative; z-index: 0; display: flex; justify-content: center; align-items: center; gap: clamp(6px, 1.1vw, 16px); min-height: clamp(84px, 15vh, 168px); padding: 6px 0; }
+.board { flex: 1; position: relative; z-index: 0; display: flex; justify-content: center; align-items: center; gap: clamp(10px, 2.1vw, 30px); min-height: clamp(84px, 15vh, 168px); padding: 6px 0; }
 .minion { position: relative; width: clamp(54px, 9vw, 104px); aspect-ratio: .8; cursor: pointer; container-type: inline-size; flex: none; --glow: transparent; transition: transform .15s; }
 .minion .face { position: absolute; inset: 0; border-radius: 50% / 46%; background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.22), transparent 60%), radial-gradient(circle at 50% 110%, rgba(0,0,0,.75), transparent 65%), var(--c); box-shadow: 0 0 0 2px #121212, 0 0 0 5px var(--stone), 0 0 0 6px #121212, 0 0 16px 5px var(--glow), 0 8px 14px rgba(0,0,0,.6), inset 0 0 18px rgba(0,0,0,.7); display: grid; place-items: center; overflow: hidden; transition: box-shadow .15s; }
 .minion .face .letter { font-family: var(--display); font-size: 42cqw; color: rgba(255,255,255,.35); text-shadow: 0 2px 6px #000; }
@@ -374,6 +374,73 @@ svg.map { filter: saturate(.6) brightness(.7); }
 #gameover h2 { animation: goIn .9s cubic-bezier(.2, 1.3, .4, 1) both; }
 @keyframes goIn { from { transform: scale(2.2); opacity: .2; filter: blur(10px); } }
 .go-sub { font-family: var(--display); font-size: clamp(18px, 2.4vw, 26px); color: #e8d6aa; text-shadow: 0 2px 0 #000; margin-top: -10px; }
+
+/* ---------- Board minions: metal rim, rarity gem, name ribbon, animated aura ---------- */
+/* Слои внутри существа: тень, щит провокации, аура, крылья, оправа, портрет, пузырь щита, самоцвет, лента, значки, цифры */
+.minion { isolation: isolate; }
+.minion .m-shadow { position: absolute; left: -6%; right: -6%; bottom: -16%; height: 26%; z-index: -2; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(0, 0, 0, .8), transparent 70%); }
+.minion .m-rim { position: absolute; inset: -8% -9%; z-index: 2; border-radius: 50% / 46%; pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 2.6%, #fff3c4 0 2.2%, #4a300c 2.6% 4%, transparent 4.4%),
+    radial-gradient(circle at 50% 97.4%, #fff3c4 0 2.2%, #4a300c 2.6% 4%, transparent 4.4%),
+    radial-gradient(circle at 3.2% 50%, #fff3c4 0 2.6%, #4a300c 3% 4.6%, transparent 5%),
+    radial-gradient(circle at 96.8% 50%, #fff3c4 0 2.6%, #4a300c 3% 4.6%, transparent 5%),
+    conic-gradient(from 210deg, #f6dc94, #8a6326 14%, #fff0bd 28%, #9a7030 44%, #f1cf7a 58%, #6a4a18 74%, #e8c56e 88%, #f6dc94);
+  -webkit-mask: radial-gradient(ellipse closest-side, transparent 79%, #000 81%); mask: radial-gradient(ellipse closest-side, transparent 79%, #000 81%);
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .7)); }
+.minion.t3 .m-rim { filter: drop-shadow(0 0 8px rgba(255, 200, 90, .8)) drop-shadow(0 3px 4px rgba(0, 0, 0, .7)); }
+.minion .face, .minion.shield .face { z-index: 3; animation: breathe 4.5s ease-in-out infinite; animation-delay: var(--d, 0s);
+  box-shadow: 0 0 0 2px #120c05, 0 0 0 4px color-mix(in srgb, var(--c) 65%, #fff 35%), 0 0 12px 3px color-mix(in srgb, var(--c) 70%, transparent), inset 0 0 22px rgba(0, 0, 0, .8); }
+@keyframes breathe { 50% { transform: scale(1.025); } }
+.minion.shield .face::after { display: none; }
+.minion .m-sheen { position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none; background: linear-gradient(125deg, rgba(255, 255, 255, .3) 0%, transparent 32%, transparent 72%, rgba(255, 255, 255, .08) 100%); }
+.minion.lowhp .face::before { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; background: radial-gradient(circle, transparent 38%, rgba(200, 0, 0, .6) 100%); animation: lowHp 1.2s ease-in-out infinite; }
+@keyframes lowHp { 50% { opacity: .35; } }
+
+/* Свечение состояния: бегущий огонь (можно атаковать), пульс (цель), ровный свет (выбран) */
+.minion .m-aura { position: absolute; inset: -18% -19%; z-index: 0; border-radius: 50% / 46%; opacity: 0; transition: opacity .25s; pointer-events: none;
+  background: conic-gradient(from var(--spin), transparent 0 38%, var(--glow) 54%, #fff 62%, var(--glow) 70%, transparent 86%);
+  -webkit-mask: radial-gradient(ellipse closest-side, transparent 60%, #000 70%, #000 90%, transparent 100%); mask: radial-gradient(ellipse closest-side, transparent 60%, #000 70%, #000 90%, transparent 100%);
+  filter: blur(2px) drop-shadow(0 0 6px var(--glow)); animation: spinBorder 1.8s linear infinite; }
+.minion.ready .m-aura, .minion.target .m-aura, .minion.selected .m-aura { opacity: 1; }
+.minion.target .m-aura { animation: spinBorder 1s linear infinite, auraPulse .8s ease-in-out infinite; }
+.minion.selected .m-aura { background: radial-gradient(ellipse closest-side, transparent 58%, var(--glow) 76%, transparent 100%); animation: auraPulse 1.2s ease-in-out infinite; }
+@keyframes auraPulse { 50% { filter: blur(4px) drop-shadow(0 0 16px var(--glow)); } }
+
+/* Самоцвет редкости и крылья легендарки */
+.minion .m-gem { position: absolute; top: -16%; left: 50%; z-index: 4; width: 21cqw; aspect-ratio: 1; transform: translateX(-50%) rotate(45deg); border-radius: 3cqw; pointer-events: none;
+  border: 2px solid #f3d58a; box-shadow: 0 0 0 1px #120c05, 0 0 12px var(--gem);
+  background: radial-gradient(circle at 30% 30%, #fff 0 10%, var(--gem) 45%, color-mix(in srgb, var(--gem) 35%, #000) 100%); }
+.m-gem.g1 { --gem: #4aa8ff; } .m-gem.g2 { --gem: #c066ff; } .m-gem.g3 { --gem: #ffb02e; width: 25cqw; }
+.minion .m-wings { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.minion .m-wings::before, .minion .m-wings::after { content: ""; position: absolute; top: -10%; width: 50%; height: 72%;
+  background: linear-gradient(160deg, #fff0bd, #d8a542 40%, #7a5418);
+  clip-path: polygon(100% 32%, 72% 0, 58% 22%, 34% 4%, 28% 30%, 0 22%, 18% 52%, 2% 70%, 38% 74%, 58% 100%, 100% 80%); }
+.minion .m-wings::before { left: -38%; }
+.minion .m-wings::after { right: -38%; transform: scaleX(-1); }
+
+/* Лента с именем и значки способностей */
+.minion .m-ribbon { position: absolute; left: -18%; right: -18%; bottom: 10%; z-index: 5; padding: 2.2cqw 11cqw; pointer-events: none;
+  background: linear-gradient(180deg, #f1cf7a 0 8%, #6b4d2b 8% 50%, #3a2915 50% 92%, #b8893a 92%);
+  clip-path: polygon(0 0, 100% 0, 92% 50%, 100% 100%, 0 100%, 8% 50%); }
+.minion .m-ribbon span { display: block; text-align: center; font-family: var(--display); font-size: 10.5cqw; line-height: 1.05; color: #fff6dc; text-shadow: 0 1px 2px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.minion .m-icons { position: absolute; top: -6%; left: -12%; z-index: 6; display: flex; flex-direction: column; gap: 2cqw; pointer-events: none; }
+.minion .m-ic { width: 22cqw; height: 22cqw; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 40% 30%, #3a2a16, #120c05); box-shadow: 0 0 0 2px #d8b25e, 0 2px 4px rgba(0, 0, 0, .6); }
+.minion .m-ic svg { width: 62%; height: 62%; fill: var(--gold-hi); }
+.minion .stat { z-index: 7; }
+.minion .stat::before { border-width: 2.5px; border-color: #f1d28a; box-shadow: 0 0 0 1.5px #120c05, 0 3px 6px rgba(0, 0, 0, .7), inset 0 1px 0 rgba(255, 255, 255, .45); }
+.minion .zzz { z-index: 8; }
+
+/* Провокация: серебряный щит с фаской. Божественный щит: переливающийся золотой пузырь */
+.minion.taunt::before, .minion.taunt::after { content: ""; position: absolute; z-index: -1; filter: none;
+  clip-path: polygon(50% 0, 100% 11%, 96% 56%, 50% 100%, 4% 56%, 0 11%); }
+.minion.taunt::before { inset: -27% -26% -19%; background: linear-gradient(170deg, #f4f7fb 0%, #aab2bd 24%, #6c737e 56%, #3c414a 100%); }
+.minion.taunt::after { inset: -21% -20% -13%; background: linear-gradient(170deg, #5d6470, #2a2e35 70%); }
+.minion .m-bubble { display: none; position: absolute; inset: -15% -16%; z-index: 6; border-radius: 50% / 46%; pointer-events: none;
+  background: radial-gradient(ellipse at 34% 24%, rgba(255, 255, 255, .6), transparent 22%), radial-gradient(ellipse closest-side, rgba(255, 215, 90, 0) 60%, rgba(255, 215, 90, .3) 84%, rgba(255, 240, 170, .9) 100%);
+  box-shadow: 0 0 18px 4px rgba(255, 210, 90, .55); animation: bubble 2.4s ease-in-out infinite; }
+.minion.shield .m-bubble { display: block; }
+@keyframes bubble { 50% { transform: scale(1.04); box-shadow: 0 0 28px 8px rgba(255, 210, 90, .7); } }
 
 /* ---------- Sound button and power cooldown ---------- */
 .snd-btn { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 70; width: 42px; height: 42px; border: 0; border-radius: 50%; cursor: pointer; display: grid; place-items: center; color: var(--gold-hi); background: radial-gradient(circle at 40% 30%, #4a3a22, #15100a); box-shadow: 0 0 0 2px var(--gold-lo), 0 6px 14px rgba(0, 0, 0, .6); }
@@ -1321,25 +1388,39 @@ function cardHTML(c, extra, attrs) {
     <div class="stat mana">${c.cost}</div>${stats}</div>`;
 }
 
-function minionBody(def, attack, health, hpCls, kw, sleepy) {
-  return `<div ${artAttrs(def.id, "face")}><div class="letter">${esc(def.name[0])}</div></div>
-    ${kw ? `<div class="kw">${kw}</div>` : ""}
+// Редкость по цене: 3–4 маны — синий самоцвет, 5–6 — фиолетовый, 7+ — легендарка с крыльями
+const minionTier = def => (def.cost >= 7 ? 3 : def.cost >= 5 ? 2 : def.cost >= 3 ? 1 : 0);
+const MINION_ICON = {
+  charge: '<i class="m-ic" title="Рывок"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></i>',
+  deathrattle: '<i class="m-ic" title="Предсмертный хрип"><svg viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 3 1.6 5.2 4 6.3V20h2v-2h1v2h2v-2h1v2h2v-3.7c2.4-1.1 4-3.3 4-6.3a8 8 0 0 0-8-8Zm-3 11a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z"/></svg></i>',
+};
+
+function minionBody(def, attack, health, hpCls, icons, sleepy) {
+  const tier = minionTier(def);
+  return `<div class="m-shadow"></div><div class="m-aura"></div>
+    ${tier === 3 ? '<div class="m-wings"></div>' : ""}
+    <div class="m-rim"></div>
+    <div ${artAttrs(def.id, "face")}><div class="letter">${esc(def.name[0])}</div><div class="m-sheen"></div></div>
+    <div class="m-bubble"></div>
+    ${tier ? `<div class="m-gem g${tier}"></div>` : ""}
+    ${icons ? `<div class="m-icons">${icons}</div>` : ""}
     ${sleepy ? '<div class="zzz">Zz</div>' : ""}
-    <div class="mname">${esc(def.name)}</div>
+    <div class="m-ribbon"><span>${esc(def.name)}</span></div>
     <div class="stat atk">${attack}</div>
     <div class="stat hp ${hpCls}">${health}</div>`;
 }
 
 function minionHTML(m) {
-  const kw = [];
-  if (m.charge) kw.push("Рывок");
-  if (m.def.trigger === "deathrattle") kw.push("Хрип");
+  let icons = "";
+  if (m.charge) icons += MINION_ICON.charge;
+  if (m.def.trigger === "deathrattle") icons += MINION_ICON.deathrattle;
   const hpCls = m.health < m.maxHealth ? "dmg" : (m.health > m.def.health ? "buffed" : "");
   const sleepy = m.sleeping && !m.charge && m.owner === game.current;
-  return `<div class="minion c-${m.def.attr} ${m.taunt ? "taunt" : ""} ${m.shield ? "shield" : ""} ${glowClass(m)}"
-      data-act="char" data-uid="${m.uid}" data-card="${m.def.id}" role="button" tabindex="0"
-      aria-label="${esc(m.def.name)} ${m.attack}/${m.health}">
-    ${minionBody(m.def, m.attack, m.health, hpCls, kw.join(" · "), sleepy)}
+  const low = m.health < m.maxHealth && m.health <= Math.ceil(m.maxHealth / 3);
+  return `<div class="minion c-${m.def.attr} t${minionTier(m.def)} ${m.taunt ? "taunt" : ""} ${m.shield ? "shield" : ""} ${low ? "lowhp" : ""} ${glowClass(m)}"
+      style="--d:${(m.uid % 7) * -.6}s" data-act="char" data-uid="${m.uid}" data-card="${m.def.id}" role="button" tabindex="0"
+      aria-label="${esc(m.def.name)} ${m.attack}/${m.health}${m.taunt ? ", провокация" : ""}${m.shield ? ", божественный щит" : ""}">
+    ${minionBody(m.def, m.attack, m.health, hpCls, icons, sleepy)}
   </div>`;
 }
 

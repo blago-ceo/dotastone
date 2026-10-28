@@ -25,7 +25,7 @@ MAP = {
     "Рики": "riki", "Веномастер": "venomancer", "Лайфстиллер": "lifestealer", "Буря молота": "stormhammer",
     "монкей кинг бар": "mkb", "Дезолятор": "deso", "Батлфьюри": "battlefury",
     "Шадоурейз": "ult_sf", "Сан Страй": "ult_invoker", "Ульта Пуджа": "ult_pudge", "Ребут": "ult_tinker",
-    "Землятрясение Рошана": "ult_roshanboss", "Ульта Лизы": "ult_liza",
+    "Землятрясение Рошана": "ult_roshanboss", "Ульта Рошана": "power_roshanboss", "Ульта Лизы": "ult_liza",
     "Руна дд": "rune_dd", "Руна реген": "rune_regen", "Руна ускорения": "rune_haste", "Руна богатства": "rune_bounty",
 }
 

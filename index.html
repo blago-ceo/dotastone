@@ -456,6 +456,69 @@ svg.map { filter: saturate(.6) brightness(.7); }
 .minion.shield .m-bubble { display: block; }
 @keyframes bubble { 50% { transform: scale(1.04); box-shadow: 0 0 28px 8px rgba(255, 210, 90, .7); } }
 
+/* ---------- Weapons, ultimates, runes, Roshan, mulligan ---------- */
+.stat.dur::before { border-radius: 4px 4px 50% 50% / 4px 4px 60% 60%; background: linear-gradient(180deg, #d5d9e0, #6c727e); border-color: #2a2d33; }
+.card .stat.dur { bottom: -6%; right: -10%; width: 30cqw; height: 32cqw; font-size: 15cqw; }
+.hb-left { justify-self: end; display: flex; align-items: center; gap: 18px; }
+.weapon-slot { position: relative; width: 58px; height: 58px; flex: none; cursor: pointer; }
+.weapon-slot .w-art { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: radial-gradient(circle at 40% 30%, #6b5a3a, #1a120a) center / cover; box-shadow: 0 0 0 3px #c9ced6, 0 0 0 5px #2a2d33, 0 4px 10px rgba(0, 0, 0, .6); }
+.weapon-slot .w-art.has-art { background-size: cover; background-position: center; }
+.weapon-slot .w-art .letter { font-family: var(--display); font-size: 26px; color: rgba(255, 255, 255, .5); }
+.weapon-slot .w-art.has-art .letter { display: none; }
+.weapon-slot .stat { width: 26px; height: 26px; font-size: 13px; bottom: -8px; }
+.weapon-slot .stat.atk { left: -8px; }
+.weapon-slot .stat.dur { right: -8px; }
+.portrait .hero-atk { left: -14px; bottom: 6px; width: 40px; height: 40px; font-size: 19px; }
+.portrait .stat.armor { left: auto; right: -12px; bottom: auto; top: 8px; }
+.portrait .aegis { position: absolute; top: -6px; left: -6px; width: 30px; height: 30px; z-index: 4; border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, #fff4c0, #f2c23e 45%, #8a5a08); box-shadow: 0 0 0 2px #3a2606, 0 0 16px 4px rgba(255, 215, 90, .8); animation: bubble 2s ease-in-out infinite; }
+.ult { position: relative; width: clamp(50px, 6.4vh, 66px); aspect-ratio: 1; border: 0; border-radius: 50%; cursor: pointer; padding: 0; flex: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; color: #2a1a03;
+  background: radial-gradient(circle at 40% 30%, #fff2b0, #f2c23e 45%, #8a5a08); box-shadow: 0 0 0 3px #3a2606, 0 0 0 5px #d8b25e, 0 6px 14px rgba(0, 0, 0, .6); transition: transform .12s; }
+.ult .stat.mana { top: -11px; left: 50%; transform: translateX(-50%); width: 24px; height: 24px; font-size: 12px; }
+.ult-l { font-family: var(--display); font-size: 10px; line-height: 1; max-width: 92%; text-align: center; }
+.ult-s { font-size: 9px; opacity: .8; }
+.ult.ready { animation: ultPulse 1.3s ease-in-out infinite; }
+.ult.ready:hover { transform: scale(1.08); }
+@keyframes ultPulse { 50% { box-shadow: 0 0 0 3px #3a2606, 0 0 0 5px #fff0b0, 0 0 26px 10px var(--hg); } }
+.ult.selected { box-shadow: 0 0 0 3px #3a2606, 0 0 0 5px var(--select), 0 0 22px 8px var(--select); }
+.ult.locked, .ult.used { filter: grayscale(.85) brightness(.55); cursor: default; }
+.ult.enemy { cursor: default; }
+.river-mid { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 4; display: flex; align-items: center; gap: 24px; pointer-events: none; }
+.river-mid > * { pointer-events: auto; }
+.river-mid .minion { width: clamp(52px, 7.5vw, 90px); }
+.minion.neutral .m-rim { filter: drop-shadow(0 0 10px rgba(255, 90, 60, .85)); }
+.rune { position: relative; width: 50px; height: 50px; border: 0; border-radius: 50%; cursor: pointer; display: grid; place-items: center;
+  background: radial-gradient(circle at 40% 30%, #fff, var(--rc) 40%, #000 120%); box-shadow: 0 0 0 2px rgba(255, 255, 255, .6), 0 0 20px 6px var(--rc); animation: runeFloat 2.4s ease-in-out infinite; }
+.rune.ready { box-shadow: 0 0 0 3px #fff, 0 0 30px 12px var(--rc); }
+.rune-l { position: absolute; top: 100%; margin-top: 4px; white-space: nowrap; font-size: 11px; font-weight: 600; color: #fff; text-shadow: 0 1px 2px #000; }
+@keyframes runeFloat { 50% { transform: translateY(-5px); } }
+.minion.stealthy .face { opacity: .55; filter: saturate(.4) brightness(.85); }
+.minion.stealthy .m-rim { opacity: .6; }
+.minion.stunned .face::after { content: ""; position: absolute; inset: 0; z-index: 3; border-radius: inherit; background: linear-gradient(160deg, rgba(210, 245, 255, .6), rgba(90, 160, 220, .25)); box-shadow: inset 0 0 12px rgba(220, 250, 255, .9); }
+.m-stun { position: absolute; top: 36%; left: 50%; transform: translateX(-50%); z-index: 9; font-size: 10cqw; font-weight: 800; color: #dff6ff; background: rgba(10, 40, 70, .88); padding: 1px 6px; border-radius: 8px; white-space: nowrap; pointer-events: none; }
+.ic-poison svg { fill: #9aff5a; } .ic-life svg { fill: #ff7a7a; } .ic-stealth svg { fill: #c9d4ff; }
+#ultSplash { position: fixed; inset: 0; z-index: 48; display: none; place-items: center; pointer-events: none; background: radial-gradient(circle, rgba(0, 0, 0, .25), rgba(0, 0, 0, .85)); }
+#ultSplash.show { display: grid; animation: usIn 1.25s ease-out forwards; }
+.us-face { grid-area: 1 / 1; width: min(42vw, 340px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #4a3a22, #120c06) center / cover; box-shadow: 0 0 0 6px #e9c46a, 0 0 90px 24px var(--hg, #ffb347); }
+.us-name { grid-area: 1 / 1; align-self: end; margin-bottom: 9vh; font-family: var(--display); font-size: clamp(40px, 7vw, 96px); color: var(--gold-hi); text-shadow: 0 4px 0 #000, 0 0 30px var(--hg, #ffb347); }
+@keyframes usIn { 0% { opacity: 0; transform: scale(1.3); } 15% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: scale(.96); } }
+.mull { max-width: 760px; text-align: center; align-items: center; }
+.mull-note { margin: -6px 0 0; color: var(--muted); }
+.mull-cards { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; padding: 12px 0; }
+.mull-card { position: relative; border: 0; background: none; padding: 0; cursor: pointer; transition: transform .15s; }
+.mull-card .card { width: 128px; cursor: pointer; }
+.mull-card:hover { transform: translateY(-6px); }
+.mull-x { position: absolute; inset: 0; display: none; place-items: center; z-index: 5; font-family: var(--display); font-size: 20px; color: #fff; background: rgba(120, 10, 10, .55); border-radius: 10px; text-shadow: 0 2px 0 #000; }
+.mull-card.on .mull-x { display: grid; }
+.mull-card.on .card { filter: grayscale(.6) brightness(.7); }
+.mull-wait { margin: 0; color: var(--gold); }
+@media (max-width: 900px) {
+  .weapon-slot { width: 42px; height: 42px; }
+  .hb-left { gap: 10px; }
+  .mull-card .card { width: 96px; }
+}
+
 /* ---------- Sound button and power cooldown ---------- */
 .snd-btn { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 70; width: 42px; height: 42px; border: 0; border-radius: 50%; cursor: pointer; display: grid; place-items: center; color: var(--gold-hi); background: radial-gradient(circle at 40% 30%, #4a3a22, #15100a); box-shadow: 0 0 0 2px var(--gold-lo), 0 6px 14px rgba(0, 0, 0, .6); }
 .snd-btn:hover { box-shadow: 0 0 0 2px var(--gold), 0 0 16px rgba(233, 196, 106, .4); }
@@ -558,6 +621,7 @@ svg.map { filter: saturate(.6) brightness(.7); }
         <div class="board" id="enemyBoard"></div>
       </div>
       <div class="river">
+        <div class="river-mid" id="riverMid"></div>
         <div id="status"></div>
         <button class="btn" id="cancelBtn" hidden>Отмена</button>
         <button class="btn" id="helpBtn" aria-label="Как играть">?</button>
@@ -596,6 +660,17 @@ svg.map { filter: saturate(.6) brightness(.7); }
   <div class="go-sub" id="goSub"></div>
   <button class="big-btn" id="againBtn">Играть снова</button>
 </div>
+
+<div class="overlay" id="mulligan" hidden>
+  <div class="tut mull" role="dialog" aria-labelledby="mullTitle">
+    <h2 id="mullTitle">Стартовая рука</h2>
+    <p class="mull-note">Нажмите на карты, которые хотите заменить. Они уйдут в колоду, взамен придут новые.</p>
+    <div class="mull-cards" id="mullCards"></div>
+    <button class="big-btn" id="mullDone">Готово</button>
+    <p class="mull-wait" id="mullWait" hidden>Ждём, пока друг выберет карты…</p>
+  </div>
+</div>
+<div id="ultSplash" aria-hidden="true"><div class="us-face" id="usFace"></div><div class="us-name" id="usName"></div></div>
 
 <div class="overlay" id="lobby" hidden>
   <div class="tut lobby" role="dialog" aria-labelledby="lobbyTitle">
@@ -637,6 +712,7 @@ svg.map { filter: saturate(.6) brightness(.7); }
       <li><b>Разыграйте карту:</b> нажмите на карту внизу с <b>зелёным</b> свечением. Существо встанет на стол, а заклинание сработает сразу. Если нужна цель, она загорится <b>оранжевым</b>, нажмите на неё.</li>
       <li><b>Атакуйте:</b> нажмите на своё существо с зелёным свечением, потом на врага: существо или героя. <span class="dot atk"></span> — урон, который оно наносит, <span class="dot hp"></span> — сколько урона выдержит. Существа бьют друг друга одновременно. Новое существо спит один ход (Zz), если у него нет «Рывка».</li>
       <li><b>Провокация</b> — существо на сером каменном щите. Пока оно есть у врага, атаковать можно только его. <b>Божественный щит</b> (золотое сияние) полностью блокирует первый урон.</li>
+      <li><b>Оружие</b> даёт герою атаку: нажмите на портрет, потом на врага. <b>Ультимейт</b> героя открывается на 7 мане и работает один раз. На реке появляются <b>руны</b> (нажмите, чтобы забрать), а на 12-м ходу просыпается <b>Рошан</b>: кто добьёт, получит Аегис и один раз воскреснет.</li>
       <li>Когда всё сделали, нажмите большую кнопку <b>«Конец хода»</b> справа на реке. Она загорается зелёным, когда делать больше нечего. Подсказка на реке всегда говорит, что делать дальше.</li>
     </ol>
     <button class="big-btn" id="tutClose">Понятно, играем!</button>
@@ -658,17 +734,23 @@ const TOKEN = { isToken: true };
 
 function minion(id, name, cost, attack, health, attr, opts) {
   CARDS[id] = Object.assign({ id, name, cost, type: "minion", attack, health, attr, text: "",
-    taunt: false, charge: false, shield: false, trigger: null, effect: null, value: 0, value2: 0,
-    target: null, token: null, isToken: false }, opts || {});
+    taunt: false, charge: false, shield: false, poison: false, lifesteal: false, stealth: false,
+    trigger: null, effect: null, value: 0, value2: 0, target: null, token: null, isToken: false }, opts || {});
 }
 function spell(id, name, cost, attr, effect, value, target, value2, text, opts) {
   CARDS[id] = Object.assign({ id, name, cost, type: "spell", attr, effect, value, value2: value2 || 0,
     target: target || null, text, trigger: null, token: null, isToken: false }, opts || {});
 }
+// Оружие: герой бьёт сам, каждая атака тратит 1 прочности
+function weapon(id, name, cost, attack, durability, text, opts) {
+  CARDS[id] = Object.assign({ id, name, cost, type: "weapon", attr: "item", attack, health: durability, text,
+    trigger: null, effect: null, target: null, token: null, isToken: false }, opts || {});
+}
 
 minion("melee_creep", "Мили-крип", 1, 1, 2, "neu");
 minion("ranged_creep", "Рендж-крип", 1, 2, 1, "neu");
 minion("courier", "Курьер", 1, 1, 1, "neu", { trigger: "battlecry", effect: "draw", value: 1, text: "Боевой клич: возьмите карту." });
+minion("riki", "Рики", 2, 3, 2, "agi", { stealth: true, text: "Невидимость: врагам не выбрать его целью, пока он не ударит." });
 minion("centaur", "Кентавр", 2, 2, 3, "str", { taunt: true, text: "Провокация." });
 minion("ogre", "Огр Маги", 2, 3, 2, "int");
 minion("phantom", "Фантом Ассасин", 3, 3, 2, "agi", { charge: true, text: "Рывок." });
@@ -677,9 +759,11 @@ minion("sniper", "Снайпер", 3, 2, 2, "agi", { trigger: "battlecry", effec
 minion("dazzle", "Даззл", 3, 2, 3, "int", { trigger: "battlecry", effect: "heal", value: 3, target: "any", text: "Боевой клич: восстановите 3 здоровья." });
 minion("undying", "Андаинг", 3, 2, 2, "str", { trigger: "deathrattle", effect: "summon", value: 1, token: "zombie", text: "Предсмертный хрип: призовите Зомби 2/2." });
 minion("techies", "Течис", 3, 1, 3, "int", { trigger: "deathrattle", effect: "damageAllEnemies", value: 2, text: "Предсмертный хрип: 2 урона всем врагам." });
+minion("venomancer", "Веномансер", 3, 2, 3, "agi", { poison: true, text: "Яд: уничтожает любое существо, которому нанёс урон." });
 minion("tide", "Тайдхантер", 4, 3, 5, "str", { taunt: true, text: "Провокация." });
 minion("jugg", "Джаггернаут", 4, 3, 3, "agi", { trigger: "battlecry", effect: "damageEnemyMinions", value: 1, text: "Боевой клич: 1 урон всем вражеским существам." });
 minion("brood", "Бруда", 4, 2, 3, "agi", { trigger: "battlecry", effect: "summon", value: 2, token: "spider", text: "Боевой клич: призовите двух Паучков 1/1." });
+minion("lifestealer", "Лайфстилер", 4, 3, 4, "str", { lifesteal: true, text: "Вампиризм: урон от него лечит вашего героя." });
 minion("axe", "Акс", 5, 4, 6, "str", { taunt: true, text: "Провокация." });
 minion("sven", "Свен", 6, 5, 5, "str", { charge: true, text: "Рывок." });
 minion("warlock", "Варлок", 6, 3, 3, "int", { trigger: "battlecry", effect: "summon", value: 1, token: "golem", text: "Боевой клич: призовите Голема 4/4 с провокацией." });
@@ -689,6 +773,8 @@ minion("zombie", "Зомби", 1, 2, 2, "neu", TOKEN);
 minion("spider", "Паучок", 1, 1, 1, "agi", TOKEN);
 minion("golem", "Голем", 4, 4, 4, "int", { taunt: true, text: "Провокация.", isToken: true });
 minion("robot", "Робот", 1, 1, 1, "int", TOKEN);
+// Нейтральный Рошан на реке (событие): кто добьёт — получает Аегис
+minion("roshan_boss", "Рошан", 0, 4, 15, "neu", { text: "Нейтральный. Кто добьёт, получит Аегис: герой один раз воскреснет.", isToken: true, art: "roshan" });
 
 spell("coin", "Монетка", 0, "item", "gainMana", 1, null, 0, "Получите 1 кристалл маны до конца хода.", TOKEN);
 spell("tango", "Танго", 1, "item", "heal", 4, "any", 0, "Восстановите 4 здоровья.");
@@ -696,6 +782,7 @@ spell("mom", "Маска безумия", 1, "item", "buff", 2, "friendlyMinion"
 spell("bkb", "Блэк Кинг Бар", 1, "item", "giveShield", 0, "friendlyMinion", 0, "Дайте своему существу божественный щит.");
 spell("dagon", "Дагон", 2, "item", "damage", 3, "enemy", 0, "Нанесите 3 урона врагу.");
 spell("drum", "Барабан выносливости", 2, "item", "buffFriendly", 1, null, 1, "Ваши существа получают +1/+1.");
+spell("stormhammer", "Буря молота", 3, "abil", "damageStun", 2, "enemyMinion", 0, "Нанесите 2 урона вражескому существу и оглушите его на ход.");
 spell("tome", "Том знаний", 3, "item", "draw", 2, null, 0, "Возьмите 2 карты.");
 spell("heart", "Сердце Тарраска", 3, "item", "buff", 1, "friendlyMinion", 4, "Дайте своему существу +1/+4.");
 spell("freezing", "Ледяное поле", 4, "abil", "damageAllEnemies", 2, null, 0, "Нанесите 2 урона всем врагам.");
@@ -703,16 +790,36 @@ spell("laguna", "Лагуна Блейд", 5, "abil", "damage", 6, "enemy", 0, "
 spell("finger", "Палец смерти", 5, "abil", "destroy", 0, "enemyMinion", 0, "Уничтожьте вражеское существо.");
 spell("wrath", "Гнев богов", 6, "abil", "damageEnemyMinions", 3, null, 0, "Нанесите 3 урона всем вражеским существам.");
 
+weapon("mkb", "Монкей Кинг Бар", 2, 2, 2, "Оружие. Истинный удар: пробивает божественный щит.", { pierce: true });
+weapon("deso", "Дезолятор", 3, 2, 3, "Оружие. Цель удара навсегда теряет 1 атаки.", { corrupt: true });
+weapon("battlefury", "Батфлай", 4, 3, 2, "Оружие. Рассекающий удар: 1 урон соседям цели.", { cleave: true });
+weapon("rapier", "Божественная рапира", 7, 7, 1, "Оружие. Один удар, но какой.");
+
 const HEROES = [
   { id: "sf", name: "Шадоу Финд", color: "#5a1610", power: "Реквием душ", powerText: "Нанесите 2 урона всем вражеским существам.", effect: "damageEnemyMinions", value: 2, target: null, cooldown: 3,
-    tag: "Собиратель душ", glow: "#ff3a24", orbs: ["#ff2a1a", "#b30000", "#ff6a3a"] },
+    tag: "Собиратель душ", glow: "#ff3a24", orbs: ["#ff2a1a", "#b30000", "#ff6a3a"],
+    ult: { name: "Шадоурейзы", text: "Нанесите 3 урона всем врагам.", effect: "damageAllEnemies", value: 3, target: null, cost: 6 } },
   { id: "invoker", name: "Инвокер", color: "#7a4a12", power: "Инвок", powerText: "Возьмите карту.", effect: "draw", value: 1, target: null,
-    tag: "Повелитель заклинаний", glow: "#ffb347", orbs: ["#6fd8ff", "#c77dff", "#ff8a2a"] },
+    tag: "Повелитель заклинаний", glow: "#ffb347", orbs: ["#6fd8ff", "#c77dff", "#ff8a2a"],
+    ult: { name: "Санстрайк", text: "Нанесите 6 урона любой цели.", effect: "damage", value: 6, target: "enemy", cost: 5 } },
   { id: "pudge", name: "Пудж", color: "#4c5a25", power: "Хук", powerText: "Притяните вражеское существо на свою сторону.", effect: "steal", value: 0, target: "enemyMinion", cost: 8, cooldown: 3,
-    tag: "Мясник", glow: "#9aff5a", orbs: ["#7dff4a", "#b6ff7a", "#4ad86a"] },
+    tag: "Мясник", glow: "#9aff5a", orbs: ["#7dff4a", "#b6ff7a", "#4ad86a"],
+    ult: { name: "Расчленение", text: "Уничтожьте вражеское существо, герой лечится на его здоровье.", effect: "dismember", value: 0, target: "enemyMinion", cost: 6 } },
   { id: "tinker", name: "Тинкер", color: "#1f4f74", power: "Марш машин", powerText: "Призовите Робота 1/1.", effect: "summon", value: 1, target: null, token: "robot",
-    tag: "Безумный изобретатель", glow: "#5ad8ff", orbs: ["#5ad8ff", "#ffe066", "#9fe8ff"] },
+    tag: "Безумный изобретатель", glow: "#5ad8ff", orbs: ["#5ad8ff", "#ffe066", "#9fe8ff"],
+    ult: { name: "Ребут", text: "Восполните всю ману и перезарядите силу героя.", effect: "rearm", value: 0, target: null, cost: 0 } },
 ];
+const ULT_MANA = 7; // ультимейт открывается, когда у героя 7 кристаллов маны, и работает один раз за игру
+
+// Руны появляются на реке каждые 4 хода по очереди
+const RUNES = {
+  dd: { name: "Руна двойного урона", text: "+1 к атаке всем вашим существам.", color: "#4aa8ff" },
+  regen: { name: "Руна регенерации", text: "Ваш герой восстанавливает 6 здоровья.", color: "#5bf27a" },
+  haste: { name: "Руна ускорения", text: "Ваши существа могут атаковать ещё раз.", color: "#ff5a4a" },
+  bounty: { name: "Руна богатства", text: "+2 маны в этом ходу и карта.", color: "#ffd75a" },
+};
+const RUNE_ORDER = ["bounty", "dd", "regen", "haste"];
+const RUNE_EVERY = 4, ROSHAN_TURN = 12;
 
 // Картинки зашиты в страницу (блок art-data выше), ключ = id карты, hero_… и power_… для героев.
 // Так они показываются при любом способе открыть страницу, без отдельных файлов.
@@ -732,9 +839,10 @@ function seededRng(seed) {
   };
 }
 
-function buildDeck(rng = Math.random) {
-  const pool = [];
-  for (const c of Object.values(CARDS)) if (!c.isToken) pool.push(c, c);
+// Колода: свой список id (конструктор, забег) или по 2 копии каждой карты; перемешивается по зерну
+function buildDeck(rng = Math.random, list) {
+  const pool = list ? list.map(id => CARDS[id]).filter(Boolean) : [];
+  if (!list) for (const c of Object.values(CARDS)) if (!c.isToken) pool.push(c, c);
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -742,34 +850,48 @@ function buildDeck(rng = Math.random) {
   return pool.slice(0, DECK_SIZE);
 }
 
-function canAttack(m) { return m.attack > 0 && m.attacksDone === 0 && (!m.sleeping || m.charge); }
+const atkOf = c => (c.isHero ? (c.weapon ? c.weapon.attack : 0) : c.attack);
+function canAttack(m) {
+  if (m.isHero) return !!m.weapon && m.weapon.attack > 0 && m.attacksDone === 0 && m.health > 0;
+  return m.attack > 0 && m.attacksDone === 0 && (!m.sleeping || m.charge) && !m.stunned;
+}
 
 // ======================= Правила =======================
 let uidSeq = 1;
 
 class Game {
-  // opts (для онлайна): humanDeck/aiDeck — генераторы колод, humanFirst — кто ходит первым, foeName — имя соперника
+  // opts: humanDeck/aiDeck — генераторы колод, humanList/aiList — свои колоды, humanFirst — кто ходит первым,
+  // foeName — имя соперника, mulligan — перед первым ходом даётся замена карт (тогда партию запускает begin()),
+  // aiHp — здоровье соперника, events — руны и Рошан на реке
   constructor(humanHero, aiHero, log, opts = {}) {
     this.log = log;
     this.opts = opts;
-    this.human = this.makePlayer("Вы", humanHero, false, opts.humanDeck);
-    this.ai = this.makePlayer(opts.foeName || "Противник", aiHero, true, opts.aiDeck);
+    this.human = this.makePlayer("Вы", humanHero, false, opts.humanDeck, opts.humanList);
+    this.ai = this.makePlayer(opts.foeName || "Противник", aiHero, true, opts.aiDeck, opts.aiList);
+    if (opts.aiHp) this.ai.hero.health = this.ai.hero.maxHealth = opts.aiHp;
     this.human.opp = this.ai;
     this.ai.opp = this.human;
     this.current = null;
+    this.first = null;
     this.over = false;
     this.winner = null;
     this.lastAttack = null;
     this.onPlay = null;
     this.fxQueue = [];   // события для анимаций: интерфейс проигрывает их перед перерисовкой
     this.fxSrc = null;
+    this.turnNo = 0;
+    this.rune = null;    // руна на реке: ключ из RUNES
+    this.runeCount = 0;
+    this.neutral = null; // Рошан на реке
+    this.roshanDone = false;
+    this.events = opts.events !== false;
   }
 
   emit(f) { this.fxQueue.push(f); }
 
-  makePlayer(name, heroDef, isAI, deckRng) {
-    const p = { name, isAI, deck: buildDeck(deckRng), hand: [], board: [], mana: 0, maxMana: 0, fatigue: 0, powerUsed: false };
-    p.hero = { uid: uidSeq++, isHero: true, def: heroDef, owner: p, attack: 0, health: START_HP, maxHealth: START_HP, armor: 0 };
+  makePlayer(name, heroDef, isAI, deckRng, list) {
+    const p = { name, isAI, deck: buildDeck(deckRng, list), hand: [], board: [], mana: 0, maxMana: 0, fatigue: 0, powerUsed: false, ultUsed: false };
+    p.hero = { uid: uidSeq++, isHero: true, def: heroDef, owner: p, attack: 0, health: START_HP, maxHealth: START_HP, armor: 0, weapon: null, attacksDone: 0, aegis: false };
     return p;
   }
 
@@ -779,24 +901,62 @@ class Game {
     const hf = this.opts.humanFirst;
     const first = (hf === undefined ? Math.random() < 0.5 : hf) ? this.human : this.ai;
     const second = first.opp;
+    this.first = first;
     this.say(first === this.human ? "Вы ходите первым." : this.ai.name + " ходит первым.");
     this.draw(first, 3);
     this.draw(second, 4);
     second.hand.push(CARDS.coin);
-    this.current = first;
-    this.startTurn(first);
+    if (!this.opts.mulligan) this.begin();
+  }
+
+  // Замена карт из стартовой руки: выбранные уходят под низ колоды, сверху тянутся новые (без случайности)
+  mulligan(p, indices) {
+    const idx = [...new Set(indices)].filter(i => i >= 0 && i < p.hand.length && p.hand[i].id !== "coin").sort((a, b) => b - a);
+    for (const i of idx) p.deck.push(p.hand.splice(i, 1)[0]);
+    for (let k = 0; k < idx.length; k++) p.hand.splice(Math.min(p.hand.length, idx[idx.length - 1 - k]), 0, p.deck.shift());
+    if (idx.length) this.say(p.name + ": заменено карт — " + idx.length);
+  }
+
+  begin() {
+    if (this.current) return;
+    this.current = this.first;
+    this.startTurn(this.first);
   }
 
   startTurn(p) {
+    this.turnNo++;
     p.maxMana = Math.min(MAX_MANA, p.maxMana + 1);
     p.mana = p.maxMana;
     p.powerUsed = false;
     p.played = 0;
+    p.hero.attacksDone = 0;
     if (p.powerCd > 0) p.powerCd--; // перезарядка тикает в начале своего хода
-    for (const m of p.board) { m.sleeping = false; m.attacksDone = 0; }
+    for (const m of p.board) {
+      m.sleeping = false;
+      m.attacksDone = 0;
+      m.stunned = m.stun > 0; // оглушение съедает ровно один свой ход
+      if (m.stun > 0) m.stun--;
+    }
     this.say(p === this.human ? "Ваш ход" : "Ход противника", "turn");
     this.draw(p, 1);
+    if (this.events) this.riverEvents();
     this.resolveDeaths();
+  }
+
+  riverEvents() {
+    if (!this.rune && this.turnNo % RUNE_EVERY === 0) {
+      this.rune = RUNE_ORDER[this.runeCount++ % RUNE_ORDER.length];
+      this.say("На реке появилась " + RUNES[this.rune].name.toLowerCase());
+      this.emit({ effect: "rune_spawn", rune: this.rune });
+    }
+    if (!this.roshanDone && !this.neutral && this.turnNo >= ROSHAN_TURN) {
+      const d = CARDS.roshan_boss;
+      this.neutral = { uid: uidSeq++, isHero: false, isNeutral: true, def: d, owner: null, attack: d.attack, health: d.health, maxHealth: d.health,
+        taunt: false, charge: false, shield: false, sleeping: true, attacksDone: 0 };
+      this.roshanDone = true;
+      this.say("Рошан проснулся на реке! Кто добьёт — получит Аегис.");
+      this.emit({ effect: "roshan_spawn", uid: this.neutral.uid });
+    }
   }
 
   endTurn() {
@@ -808,11 +968,12 @@ class Game {
   canPlay(p, c) {
     if (this.over || p !== this.current || c.cost > p.mana) return false;
     if (c.type === "minion") return p.board.length < MAX_BOARD;
+    if (c.type === "weapon") return true;
     return !c.target || this.hasValidTarget(p, c.target);
   }
 
   needsTarget(p, c) {
-    if (!c.target) return false;
+    if (!c.target || c.type === "weapon") return false;
     if (c.type === "minion" && c.trigger !== "battlecry") return false;
     return this.hasValidTarget(p, c.target);
   }
@@ -832,6 +993,10 @@ class Game {
     if (c.type === "minion") {
       this.summon(p, c, -1);
       if (c.trigger === "battlecry") this.apply(p, c.effect, c.value, c.value2, c.token, target, c.name, -1);
+    } else if (c.type === "weapon") {
+      p.hero.weapon = { def: c, attack: c.attack, dur: c.health };
+      this.emit({ effect: "weapon", id: c.id, caster: p.hero.uid, targets: [p.hero.uid] });
+      this.say(p.hero.def.name + " берёт «" + c.name + "»");
     } else {
       this.apply(p, c.effect, c.value, c.value2, c.token, target, c.name, -1);
     }
@@ -861,12 +1026,53 @@ class Game {
     return true;
   }
 
-  hasTaunt(p) { return p.board.some(m => m.taunt && m.health > 0); }
+  ultUnlocked(p) { return p.maxMana >= ULT_MANA; }
+
+  canUseUlt(p) {
+    const u = p.hero.def.ult;
+    if (!u || this.over || p !== this.current || p.ultUsed || !this.ultUnlocked(p) || p.mana < u.cost) return false;
+    return !u.target || this.hasValidTarget(p, u.target);
+  }
+
+  useUlt(p, target) {
+    if (!this.canUseUlt(p)) return false;
+    const u = p.hero.def.ult;
+    if (u.target && !this.isValidTarget(p, u.target, target)) return false;
+    p.mana -= u.cost;
+    p.ultUsed = true;
+    this.say(p.name + ": УЛЬТИМЕЙТ «" + u.name + "»");
+    this.fxSrc = { id: "ult_" + p.hero.def.id };
+    this.emit({ effect: "ult_splash", hero: p.hero.def.id, name: u.name, mine: p === this.human });
+    this.apply(p, u.effect, u.value, 0, null, target, u.name, -1);
+    this.resolveDeaths();
+    return true;
+  }
+
+  canTakeRune(p) { return !!this.rune && !this.over && p === this.current; }
+
+  takeRune(p) {
+    if (!this.canTakeRune(p)) return false;
+    const r = this.rune;
+    this.rune = null;
+    this.say(p.name + ": забрана " + RUNES[r].name.toLowerCase());
+    this.emit({ effect: "rune_take", rune: r, caster: p.hero.uid, mine: p === this.human, targets: r === "regen" ? [p.hero.uid] : p.board.map(m => m.uid) });
+    if (r === "dd") for (const m of p.board) m.attack += 1;
+    else if (r === "regen") this.heal(p.hero, 6);
+    else if (r === "haste") for (const m of p.board) { m.attacksDone = 0; m.sleeping = false; m.stunned = false; }
+    else if (r === "bounty") { p.mana = Math.min(MAX_MANA, p.mana + 2); this.draw(p, 1); }
+    this.resolveDeaths();
+    return true;
+  }
+
+  // Невидимых и самого Рошана провокация не касается
+  hasTaunt(p) { return !!p && p.board.some(m => m.taunt && !m.stealth && m.health > 0); }
 
   canAttackTarget(a, t) {
     if (this.over || !a || !t) return false;
     if (a.owner !== this.current || !canAttack(a)) return false;
     if (t.owner === a.owner || t.health <= 0) return false;
+    if (t.isNeutral) return true;
+    if (t.stealth) return false;
     return (!t.isHero && t.taunt) || !this.hasTaunt(t.owner);
   }
 
@@ -874,20 +1080,34 @@ class Game {
     if (!this.canAttackTarget(a, t)) return false;
     this.say(a.owner.name + ": " + a.def.name + " атакует " + t.def.name);
     this.lastAttack = { a: a.uid, t: t.uid };
-    this.emit({ effect: "attack", a: a.uid, t: t.uid, big: a.attack >= 5 });
-    const ad = a.attack, td = t.attack;
-    this.damage(t, ad);
-    this.damage(a, td);
+    const ad = atkOf(a), td = t.isHero ? 0 : t.attack; // герои отвечают только оружием в свой ход
+    this.emit({ effect: "attack", a: a.uid, t: t.uid, big: ad >= 5 });
+    if (!a.isHero) a.stealth = false; // ударил — вышел из невидимости
+    const w = a.isHero ? a.weapon : null;
+    const tOwnerBoard = t.owner ? t.owner.board : null, tIdx = tOwnerBoard ? tOwnerBoard.indexOf(t) : -1;
+    this.damage(t, ad, a, w && w.def.pierce);
+    this.damage(a, td, t);
+    if (w) {
+      if (w.def.corrupt && !t.isHero) t.attack = Math.max(0, t.attack - 1);
+      if (w.def.cleave && tIdx >= 0) for (const n of [tOwnerBoard[tIdx - 1], tOwnerBoard[tIdx + 1]]) if (n) this.damage(n, 1, a);
+      w.dur--;
+      if (w.dur <= 0) { a.weapon = null; this.say("«" + w.def.name + "» сломано"); }
+    }
     a.attacksDone++;
     this.resolveDeaths();
     return true;
   }
 
-  all() { return [this.human.hero, this.ai.hero, ...this.human.board, ...this.ai.board]; }
+  all() {
+    const list = [this.human.hero, this.ai.hero, ...this.human.board, ...this.ai.board];
+    if (this.neutral) list.push(this.neutral);
+    return list;
+  }
 
   isValidTarget(caster, type, c) {
     if (!c || c.health <= 0) return false;
     const enemy = c.owner !== caster, isMinion = !c.isHero;
+    if (enemy && c.stealth) return false; // невидимого врага не выбрать
     switch (type) {
       case "any": return true;
       case "enemy": return enemy;
@@ -910,6 +1130,13 @@ class Game {
         fx([target]);
         this.say(src + ": " + v + " урона → " + target.def.name);
         this.damage(target, v);
+        break;
+      case "damageStun":
+        if (!target) return;
+        fx([target]);
+        this.say(src + ": " + v + " урона и оглушение → " + target.def.name);
+        this.damage(target, v);
+        if (!target.isHero) target.stun = 1;
         break;
       case "damageEnemyMinions":
         fx(enemy.board);
@@ -962,6 +1189,22 @@ class Game {
         this.say(src + ": уничтожено " + target.def.name);
         target.health = 0;
         break;
+      case "dismember": {
+        if (!target || target.isHero) return;
+        fx([target]);
+        const hp = Math.max(0, target.health);
+        this.say(src + ": " + target.def.name + " растерзан, +" + hp + " здоровья");
+        target.health = 0;
+        this.heal(caster.hero, hp);
+        break;
+      }
+      case "rearm":
+        fx([caster.hero]);
+        caster.mana = caster.maxMana;
+        caster.powerUsed = false;
+        caster.powerCd = 0;
+        this.say(src + ": мана восполнена, сила героя перезаряжена");
+        break;
       case "gainMana":
         fx([caster.hero]);
         caster.mana = Math.min(MAX_MANA, caster.mana + v);
@@ -974,7 +1217,7 @@ class Game {
         break;
       case "steal": {
         // Хук: существо переходит к заклинателю и атакует только со следующего хода
-        if (!target || target.isHero || target.owner === caster || caster.board.length >= MAX_BOARD) return;
+        if (!target || target.isHero || target.isNeutral || target.owner === caster || caster.board.length >= MAX_BOARD) return;
         fx([target]);
         const from = target.owner.board, i = from.indexOf(target);
         if (i >= 0) from.splice(i, 1);
@@ -988,19 +1231,26 @@ class Game {
     }
   }
 
-  damage(c, n) {
+  // src — кто бьёт (для яда и вампиризма), pierce — пробить божественный щит
+  damage(c, n, src, pierce) {
     if (n <= 0 || c.health <= 0) return;
-    if (!c.isHero && c.shield) {
+    if (!c.isHero && c.shield && !pierce) {
       c.shield = false;
       this.say(c.def.name + " теряет божественный щит");
       return;
     }
+    if (!c.isHero && c.shield && pierce) c.shield = false;
+    let dealt = n;
     if (c.isHero && c.armor > 0) {
       const a = Math.min(c.armor, n);
       c.armor -= a;
       n -= a;
     }
     c.health -= n;
+    if (src && !src.isHero && !src.isNeutral) {
+      if (src.poison && !c.isHero && !c.isNeutral && c.health > 0) { c.health = 0; this.say(src.def.name + ": яд убивает " + c.def.name); }
+      if (src.lifesteal && src.owner) this.heal(src.owner.hero, dealt);
+    }
   }
 
   heal(c, n) { c.health = Math.min(c.maxHealth, c.health + n); }
@@ -1008,7 +1258,8 @@ class Game {
   summon(p, def, idx) {
     if (p.board.length >= MAX_BOARD) return null;
     const m = { uid: uidSeq++, isHero: false, def, owner: p, attack: def.attack, health: def.health, maxHealth: def.health,
-      taunt: def.taunt, charge: def.charge, shield: def.shield, sleeping: true, attacksDone: 0 };
+      taunt: def.taunt, charge: def.charge, shield: def.shield, poison: def.poison, lifesteal: def.lifesteal, stealth: def.stealth,
+      sleeping: true, attacksDone: 0, stun: 0, stunned: false };
     if (idx < 0 || idx > p.board.length) p.board.push(m); else p.board.splice(idx, 0, m);
     return m;
   }
@@ -1044,6 +1295,26 @@ class Game {
           if (m.def.trigger === "deathrattle") this.apply(p, m.def.effect, m.def.value, m.def.value2, m.def.token, null, m.def.name, i);
         }
       }
+      // Рошан на реке: Аегис достаётся тому, в чей ход он пал
+      if (this.neutral && this.neutral.health <= 0) {
+        const n = this.neutral, p = this.current;
+        this.neutral = null;
+        this.emit({ effect: "death", uid: n.uid, attr: "neu", big: true });
+        if (p) {
+          p.hero.aegis = true;
+          this.say(p.name + ": Рошан повержен! Герой получает Аегис");
+          this.emit({ effect: "aegis_get", caster: p.hero.uid, mine: p === this.human, targets: [p.hero.uid] });
+        }
+      }
+    }
+    // Аегис: герой один раз встаёт с 15 здоровья
+    for (const p of [this.human, this.ai]) {
+      if (p.hero.health <= 0 && p.hero.aegis) {
+        p.hero.aegis = false;
+        p.hero.health = 15;
+        this.say(p.hero.def.name + " воскресает благодаря Аегису!");
+        this.emit({ effect: "aegis_use", caster: p.hero.uid, mine: p === this.human, targets: [p.hero.uid] });
+      }
     }
     if (this.over) return;
     const hd = this.human.hero.health <= 0, ad = this.ai.hero.health <= 0;
@@ -1055,7 +1326,19 @@ class Game {
 
 // ======================= Бот =======================
 const AI = {
-  act(g, me) { return this.coin(g, me) || this.card(g, me) || this.power(g, me) || this.attack(g, me); },
+  act(g, me) {
+    return this.rune(g, me) || this.coin(g, me) || this.ult(g, me) || this.card(g, me) || this.power(g, me) || this.attack(g, me);
+  },
+
+  // Бот меняет дорогие карты из стартовой руки
+  mulliganPick(me) { return me.hand.map((c, i) => (c.id !== "coin" && c.cost >= 5 ? i : -1)).filter(i => i >= 0); },
+
+  rune(g, me) {
+    if (!g.canTakeRune(me)) return false;
+    // Ускорение и урон полезнее, когда на столе есть существа
+    if ((g.rune === "haste" || g.rune === "dd") && me.board.length === 0) return false;
+    return g.takeRune(me);
+  },
 
   coin(g, me) {
     const i = me.hand.findIndex(c => c.id === "coin");
@@ -1065,12 +1348,26 @@ const AI = {
     return g.playCard(me, i, null);
   },
 
+  ult(g, me) {
+    if (me.easy || !g.canUseUlt(me)) return false;
+    const u = me.hero.def.ult;
+    if (u.effect === "damageAllEnemies" && me.opp.board.length < 2) return false;
+    if (u.effect === "rearm" && me.mana > 2) return false; // Ребут — когда мана почти кончилась
+    let t = null;
+    if (u.target) {
+      t = this.chooseTarget(g, me, u.effect === "dismember" ? "destroy" : u.effect, u.value, u.target);
+      if (!t) return false;
+    }
+    return g.useUlt(me, t);
+  },
+
   card(g, me) {
     if (me.easy && me.played >= 1) return false; // лёгкий бот играет одну карту за ход
     const order = me.hand.map((c, i) => i).sort((a, b) => me.hand[b].cost - me.hand[a].cost);
     for (const i of order) {
       const c = me.hand[i];
       if (c.id === "coin" || !g.canPlay(me, c)) continue;
+      if (c.type === "weapon" && me.hero.weapon && me.hero.weapon.dur > 1) continue; // не выбрасываем целое оружие
       let t = null;
       if (g.needsTarget(me, c)) {
         t = this.chooseTarget(g, me, c.effect, c.value, c.target);
@@ -1097,7 +1394,7 @@ const AI = {
   },
 
   attack(g, me) {
-    for (const m of me.board) {
+    for (const m of [...me.board, me.hero]) {
       if (!canAttack(m)) continue;
       const t = this.attackTarget(g, me, m);
       if (t && g.attack(m, t)) return true;
@@ -1106,27 +1403,31 @@ const AI = {
   },
 
   attackTarget(g, me, a) {
-    const enemy = me.opp;
+    const enemy = me.opp, A = atkOf(a), aHp = a.health;
     const options = enemy.board.filter(t => g.canAttackTarget(a, t));
     const face = g.canAttackTarget(a, enemy.hero);
+    const n = g.neutral && g.canAttackTarget(a, g.neutral) ? g.neutral : null;
     if (me.easy) {
       // Лёгкий бот бьёт наугад
       const all = face ? options.concat([enemy.hero]) : options;
       return all.length ? all[Math.floor(Math.random() * all.length)] : null;
     }
     if (face) {
-      const total = me.board.filter(canAttack).reduce((s, m) => s + m.attack, 0);
-      if (total >= enemy.hero.health + enemy.hero.armor) return enemy.hero;
+      const total = [...me.board, me.hero].filter(canAttack).reduce((s, m) => s + atkOf(m), 0);
+      if (total >= enemy.hero.health + enemy.hero.armor && !enemy.hero.aegis) return enemy.hero;
     }
+    // Добить Рошана ради Аегиса, если хватает урона
+    if (n && n.health <= A && (a.isHero || aHp > n.attack || n.health <= 4)) return n;
     let best = null, bestScore = -Infinity;
     for (const t of options) {
-      const kills = !t.shield && t.health <= a.attack;
-      const survives = t.attack < a.health;
+      const kills = (!t.shield || (a.isHero && a.weapon && a.weapon.def.pierce)) && (t.health <= A || (a.poison && A > 0));
+      const survives = t.attack < aHp;
       let score;
       if (kills && survives) score = 100 + t.attack * 2 + t.health;
-      else if (kills && t.attack + t.health >= a.attack + a.health) score = 50 + t.attack;
+      else if (kills && t.attack + t.health >= A + aHp && !a.isHero) score = 50 + t.attack;
       else if (!face) score = -t.health;
       else continue;
+      if (a.isHero && t.attack >= aHp - 4) continue; // герой не лезет под сильный ответ
       if (score > bestScore) { bestScore = score; best = t; }
     }
     return best || (face ? enemy.hero : null);
@@ -1137,14 +1438,17 @@ const AI = {
     for (const c of g.all()) {
       if (!g.isValidTarget(me, type, c)) continue;
       const mine = c.owner === me, m = c.isHero ? null : c;
+      if (c.isNeutral && effect !== "damage") continue;
       let score;
       switch (effect) {
         case "damage":
+        case "damageStun":
           if (mine) continue;
+          if (c.isNeutral) { score = c.health <= value ? 120 : -1; break; }
           if (m && !m.shield && m.health <= value) score = 100 + m.attack * 2 + m.health;
           else if (!m) score = 50;
           else if (m.shield && value === 1) score = 60 + m.attack;
-          else score = 10 + m.attack;
+          else score = 10 + m.attack + (effect === "damageStun" ? m.attack * 2 : 0);
           break;
         case "heal":
           if (!mine || c.health >= c.maxHealth) continue;
@@ -1166,7 +1470,7 @@ const AI = {
         case "steal":
           if (mine || !m) continue;
           score = m.attack * 2 + m.health + (m.taunt ? 2 : 0);
-          if (m.attack + m.health < 5) continue; // мелочь не стоит 6 маны
+          if (m.attack + m.health < 5) continue; // мелочь не стоит 8 маны
           break;
         default: continue;
       }
@@ -1352,7 +1656,7 @@ function startGame(hero) {
   const others = HEROES.filter(h => h !== hero);
   const aiHero = others[Math.floor(Math.random() * others.length)];
   $("logList").innerHTML = "";
-  game = new Game(hero, aiHero, addLog);
+  game = new Game(hero, aiHero, addLog, { mulligan: true });
   if (easy) {
     game.ai.easy = true;
     game.ai.hero.health = game.ai.hero.maxHealth = 20;
@@ -1369,15 +1673,49 @@ function startGame(hero) {
   game.fxQueue.length = 0;
   render();
   if (!tutorialSeen()) showTutorial();
-  if (game.current === game.ai) aiTurn();
-  else showBanner("Ваш ход");
+  const run = runId;
+  showMulligan(sel => {
+    if (run !== runId) return;
+    game.mulligan(game.human, sel);
+    game.mulligan(game.ai, AI.mulliganPick(game.ai));
+    game.begin();
+    game.fxQueue.length = 0;
+    render();
+    if (game.current === game.ai) aiTurn();
+    else showBanner("Ваш ход");
+  });
+}
+
+// Окно замены карт: выбранные отмечаются крестом
+function showMulligan(done) {
+  const sel = new Set();
+  const box = $("mullCards");
+  box.innerHTML = game.human.hand.map((c, i) => c.id === "coin" ? "" :
+    `<button class="mull-card" data-i="${i}" aria-pressed="false">${cardHTML(c, "", "")}<span class="mull-x">Заменить</span></button>`).join("");
+  box.onclick = e => {
+    const b = e.target.closest(".mull-card");
+    if (!b) return;
+    const i = +b.dataset.i;
+    if (sel.has(i)) sel.delete(i); else sel.add(i);
+    b.classList.toggle("on", sel.has(i));
+    b.setAttribute("aria-pressed", sel.has(i));
+    SND.play("ui");
+  };
+  $("mullWait").hidden = true;
+  $("mullDone").hidden = false;
+  $("mullDone").onclick = () => {
+    $("mullDone").onclick = null;
+    $("mulligan").hidden = true;
+    done([...sel]);
+  };
+  $("mulligan").hidden = false;
 }
 
 // ---------- Отрисовка ----------
 function glowClass(c) {
   if (mode === "attack" && c === attacker) return "selected";
   if (isTarget(c)) return "target";
-  if (mode === "idle" && humanCanAct() && !c.isHero && c.owner === game.human && canAttack(c)) return "ready";
+  if (mode === "idle" && humanCanAct() && c.owner === game.human && canAttack(c)) return "ready";
   return "";
 }
 
@@ -1385,6 +1723,7 @@ function isTarget(c) {
   if (!humanCanAct()) return false;
   if (mode === "card") return game.isValidTarget(game.human, game.human.hand[pending].target, c);
   if (mode === "power") return game.isValidTarget(game.human, game.human.hero.def.target, c);
+  if (mode === "ult") return game.isValidTarget(game.human, game.human.hero.def.ult.target, c);
   if (mode === "attack") return game.canAttackTarget(attacker, c);
   return false;
 }
@@ -1392,7 +1731,9 @@ function isTarget(c) {
 function cardHTML(c, extra, attrs) {
   const stats = c.type === "minion"
     ? `<div class="stat atk">${c.attack}</div><div class="stat hp">${c.health}</div>`
-    : `<div class="ctype">${c.attr === "item" ? "Предмет" : "Способность"}</div>`;
+    : c.type === "weapon"
+      ? `<div class="stat atk">${c.attack}</div><div class="stat dur">${c.health}</div><div class="ctype">Оружие</div>`
+      : `<div class="ctype">${c.attr === "item" ? "Предмет" : "Способность"}</div>`;
   return `<div class="card c-${c.attr} ${c.type} ${extra || ""}" ${attrs || ""}>
     <div class="cframe">
       <div ${artAttrs(c.id, "art")}><div class="letter">${esc(c.name[0])}</div></div>
@@ -1406,6 +1747,9 @@ function cardHTML(c, extra, attrs) {
 const minionTier = def => (def.cost >= 7 ? 3 : def.cost >= 5 ? 2 : def.cost >= 3 ? 1 : 0);
 const MINION_ICON = {
   charge: '<i class="m-ic" title="Рывок"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></i>',
+  poison: '<i class="m-ic ic-poison" title="Яд"><svg viewBox="0 0 24 24"><path d="M12 2s-6 7.2-6 12a6 6 0 0 0 12 0c0-4.8-6-12-6-12Z"/></svg></i>',
+  lifesteal: '<i class="m-ic ic-life" title="Вампиризм"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8.3 3 5 6.4 5c2 0 3.3 1 4.1 2.2h3C14.3 6 15.6 5 17.6 5 21 5 23 8.3 21.5 11.8 19.5 16.4 12 21 12 21Zm-2-11-1 4h2l-1 3 3-5h-2l1-2Z"/></svg></i>',
+  stealth: '<i class="m-ic ic-stealth" title="Невидимость"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6 10-6c2 0 3.7.6 5.1 1.4L19.6 5 21 6.4 4.4 23 3 21.6l2.6-2.6C3.3 17.1 2 12 2 12Zm10 6c-1 0-1.9-.2-2.8-.5l1.6-1.6a4 4 0 0 0 5.1-5.1l2.1-2.1C20.6 10.4 22 12 22 12s-3.6 6-10 6Z"/></svg></i>',
   deathrattle: '<i class="m-ic" title="Предсмертный хрип"><svg viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 3 1.6 5.2 4 6.3V20h2v-2h1v2h2v-2h1v2h2v-3.7c2.4-1.1 4-3.3 4-6.3a8 8 0 0 0-8-8Zm-3 11a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z"/></svg></i>',
 };
 
@@ -1414,7 +1758,7 @@ function minionBody(def, attack, health, hpCls, icons, sleepy) {
   return `<div class="m-shadow"></div><div class="m-aura"></div>
     ${tier === 3 ? '<div class="m-wings"></div>' : ""}
     <div class="m-rim"></div>
-    <div ${artAttrs(def.id, "face")}><div class="letter">${esc(def.name[0])}</div><div class="m-sheen"></div></div>
+    <div ${artAttrs(def.art || def.id, "face")}><div class="letter">${esc(def.name[0])}</div><div class="m-sheen"></div></div>
     <div class="m-bubble"></div>
     ${tier ? `<div class="m-gem g${tier}"></div>` : ""}
     ${icons ? `<div class="m-icons">${icons}</div>` : ""}
@@ -1428,13 +1772,18 @@ function minionHTML(m) {
   let icons = "";
   if (m.charge) icons += MINION_ICON.charge;
   if (m.def.trigger === "deathrattle") icons += MINION_ICON.deathrattle;
+  if (m.poison) icons += MINION_ICON.poison;
+  if (m.lifesteal) icons += MINION_ICON.lifesteal;
+  if (m.stealth) icons += MINION_ICON.stealth;
+  const stunned = m.stunned || m.stun > 0;
   const hpCls = m.health < m.maxHealth ? "dmg" : (m.health > m.def.health ? "buffed" : "");
   const sleepy = m.sleeping && !m.charge && m.owner === game.current;
   const low = m.health < m.maxHealth && m.health <= Math.ceil(m.maxHealth / 3);
-  return `<div class="minion c-${m.def.attr} t${minionTier(m.def)} ${m.taunt ? "taunt" : ""} ${m.shield ? "shield" : ""} ${low ? "lowhp" : ""} ${glowClass(m)}"
+  return `<div class="minion c-${m.def.attr} t${minionTier(m.def)} ${m.taunt ? "taunt" : ""} ${m.shield ? "shield" : ""} ${low ? "lowhp" : ""} ${m.stealth ? "stealthy" : ""} ${stunned ? "stunned" : ""} ${m.isNeutral ? "neutral" : ""} ${glowClass(m)}"
       style="--d:${(m.uid % 7) * -.6}s" data-act="char" data-uid="${m.uid}" data-card="${m.def.id}" role="button" tabindex="0"
       aria-label="${esc(m.def.name)} ${m.attack}/${m.health}${m.taunt ? ", провокация" : ""}${m.shield ? ", божественный щит" : ""}">
     ${minionBody(m.def, m.attack, m.health, hpCls, icons, sleepy)}
+    ${stunned ? '<div class="m-stun" title="Оглушён: пропускает ход">Оглушён</div>' : ""}
   </div>`;
 }
 
@@ -1461,6 +1810,8 @@ function heroBarHTML(p) {
       <div class="rune-ring"></div>
       ${heroFaceHTML(h.def)}
       <div class="pname">${esc(h.def.name)}</div>
+      ${h.weapon ? `<div class="stat atk hero-atk">${h.weapon.attack}</div>` : ""}
+      ${h.aegis ? '<div class="aegis" title="Аегис: герой один раз воскреснет"></div>' : ""}
       ${h.armor > 0 ? `<div class="stat armor">${h.armor}</div>` : ""}
       <div class="stat hp ${h.health < h.maxHealth ? "dmg" : ""}">${h.health}</div>
     </div>`;
@@ -1471,9 +1822,45 @@ function heroBarHTML(p) {
         <div class="pw-letter">${esc(h.def.power[0])}</div>
         ${p.powerCd > 0 ? `<div class="pw-cd" title="Перезарядка">${p.powerCd}</div>` : ""}
       </button>
+      ${ultButtonHTML(p, isHuman)}
       <div class="power-label"><b>${esc(h.def.power)}</b>${esc(h.def.powerText)}${h.def.cooldown ? `<i class="pw-cd-note">${p.powerCd > 0 ? "Перезарядка: ещё " + p.powerCd + " " + (p.powerCd === 1 ? "ход" : "хода") : "Перезарядка " + h.def.cooldown + " хода"}</i>` : ""}</div>
     </div>`;
-  return mana + portrait + power;
+  // Оружие стоит рядом с маной; нажатие по нему = выбрать героя для удара
+  const weaponEl = h.weapon ? `<div class="weapon-slot" ${isHuman ? 'data-act="hero"' : ""} data-card="${h.weapon.def.id}" role="button" tabindex="0"
+      title="${esc(h.weapon.def.name)}: ${esc(h.weapon.def.text)}" aria-label="Оружие ${esc(h.weapon.def.name)}, атака ${h.weapon.attack}, прочность ${h.weapon.dur}">
+      <div ${artAttrs(h.weapon.def.id, "w-art")}><div class="letter">${esc(h.weapon.def.name[0])}</div></div>
+      <div class="stat atk">${h.weapon.attack}</div><div class="stat dur">${h.weapon.dur}</div></div>` : "";
+  return `<div class="hb-left">${mana}${weaponEl}</div>` + portrait + power;
+}
+
+function ultButtonHTML(p, isHuman) {
+  const u = p.hero.def.ult;
+  if (!u) return "";
+  const locked = !game.ultUnlocked(p);
+  let cls = isHuman ? "" : "enemy";
+  if (isHuman && mode === "ult") cls = "selected";
+  else if (isHuman && humanCanAct() && game.canUseUlt(p)) cls = "ready";
+  if (p.ultUsed) cls += " used";
+  if (locked) cls += " locked";
+  const state = p.ultUsed ? "использован" : locked ? "с " + ULT_MANA + " маны" : "готов";
+  return `<button class="ult ${cls}" style="--hg:${p.hero.def.glow}" ${isHuman ? 'data-act="ult"' : "disabled"}
+      title="Ультимейт «${esc(u.name)}»: ${esc(u.text)} Открывается на ${ULT_MANA} мане, один раз за игру."
+      aria-label="Ультимейт ${esc(u.name)}, ${state}">
+      <div class="stat mana">${u.cost}</div>
+      <span class="ult-l">${esc(u.name)}</span><span class="ult-s">${state}</span>
+    </button>`;
+}
+
+function riverHTML() {
+  let h = "";
+  if (game.rune) {
+    const r = RUNES[game.rune];
+    const can = humanCanAct() && game.canTakeRune(game.human);
+    h += `<button class="rune r-${game.rune}${can ? " ready" : ""}" data-act="rune" style="--rc:${r.color}" title="${esc(r.name)}: ${esc(r.text)}"
+      aria-label="${esc(r.name)}: ${esc(r.text)}"><span class="rune-core"></span><span class="rune-l">${esc(r.name.replace("Руна ", ""))}</span></button>`;
+  }
+  if (game.neutral) h += minionHTML(game.neutral);
+  return h;
 }
 
 function defaultStatus() {
@@ -1481,13 +1868,18 @@ function defaultStatus() {
   if (!humanCanAct()) return online ? "Ходит друг…" : "Противник думает…";
   if (mode === "card") return "Теперь нажмите на цель с оранжевым свечением для «" + game.human.hand[pending].name + "».";
   if (mode === "power") return "Нажмите на цель с оранжевым свечением.";
+  if (mode === "ult") return "Ультимейт: выберите цель с оранжевым свечением.";
   if (mode === "attack") return "Теперь нажмите на врага с оранжевым свечением: существо или героя.";
   // Подсказываем следующий полезный шаг
   const me = game.human;
+  if (game.canTakeRune(me)) return "На реке руна: нажмите на неё, чтобы забрать.";
+  if (game.canUseUlt(me)) return "Готов ультимейт «" + me.hero.def.ult.name + "»: золотая кнопка рядом с силой героя.";
   if (me.hand.some(c => game.canPlay(me, c)))
     return "Нажмите на карту внизу с зелёным свечением, и она выйдет на стол. Цена в синем ромбе, маны у вас: " + me.mana + ".";
   if (me.board.some(canAttack))
     return "Нажмите на своё существо с зелёным свечением, а потом на врага, чтобы атаковать.";
+  if (canAttack(me.hero))
+    return "Ваш герой с оружием может ударить: нажмите на портрет, потом на врага.";
   if (game.canUsePower(me))
     return "Осталась мана: нажмите круглую кнопку силы героя рядом с портретом.";
   return "Ходов больше нет. Нажмите «Конец хода» →";
@@ -1495,7 +1887,7 @@ function defaultStatus() {
 
 function anyActionLeft() {
   const me = game.human;
-  return me.hand.some(c => game.canPlay(me, c)) || game.canUsePower(me) || me.board.some(canAttack);
+  return me.hand.some(c => game.canPlay(me, c)) || game.canUsePower(me) || me.board.some(canAttack) || canAttack(me.hero) || game.canUseUlt(me) || game.canTakeRune(me);
 }
 
 function render() {
@@ -1505,6 +1897,7 @@ function render() {
   $("playerBar").innerHTML = heroBarHTML(game.human);
   $("enemyBoard").innerHTML = game.ai.board.map(minionHTML).join("");
   $("playerBoard").innerHTML = game.human.board.map(minionHTML).join("");
+  $("riverMid").innerHTML = riverHTML();
 
   const can = humanCanAct();
   $("hand").innerHTML = game.human.hand.map((c, i) => {
@@ -1706,6 +2099,27 @@ function onPowerClick() {
   afterAction();
 }
 
+function onUltClick() {
+  if (!humanCanAct()) return;
+  if (mode === "ult") { resetMode(); render(); return; }
+  const me = game.human, u = me.hero.def.ult;
+  resetMode();
+  if (!game.canUseUlt(me)) {
+    setHint(me.ultUsed ? "Ультимейт уже использован в этой игре." : !game.ultUnlocked(me)
+      ? "Ультимейт откроется, когда у вас будет " + ULT_MANA + " кристаллов маны." : "Для ультимейта нужно " + u.cost + " маны.");
+    return;
+  }
+  if (u.target) { mode = "ult"; render(); return; }
+  if (game.useUlt(me, null)) sendMove({ t: "ult", tg: null });
+  afterAction();
+}
+
+function onRuneClick() {
+  if (!humanCanAct()) return;
+  resetMode();
+  if (game.takeRune(game.human)) { sendMove({ t: "rune" }); afterAction(); }
+}
+
 function onCharClick(c) {
   if (!humanCanAct() || !c) return;
   const me = game.human;
@@ -1715,6 +2129,11 @@ function onCharClick(c) {
     else setHint("Сюда нельзя: выберите цель с оранжевым свечением.");
     return;
   }
+  if (mode === "ult") {
+    const tg = online ? encTarget(c) : null;
+    if (game.useUlt(me, c)) { sendMove({ t: "ult", tg }); resetMode(); afterAction(); } else setHint("Сюда нельзя: выберите цель с оранжевым свечением.");
+    return;
+  }
   if (mode === "power") {
     const tg = online ? encTarget(c) : null;
     if (game.usePower(me, c)) { sendMove({ t: "power", tg }); resetMode(); afterAction(); } else setHint("Сюда нельзя: выберите цель с оранжевым свечением.");
@@ -1722,7 +2141,7 @@ function onCharClick(c) {
   }
   if (mode === "attack") {
     if (c === attacker) { resetMode(); render(); return; }
-    if (isMine) { resetMode(); selectAttacker(c); return; }
+    if (isMine || (c.isHero && c.owner === me)) { resetMode(); selectAttacker(c); return; }
     const a = me.board.indexOf(attacker), tg = online ? encTarget(c) : null;
     if (game.attack(attacker, c)) { sendMove({ t: "attack", a, tg }); resetMode(); afterAction(); }
     else if (game.hasTaunt(me.opp)) setHint("Сначала нужно убить существо с провокацией (на сером щите).");
@@ -1730,11 +2149,15 @@ function onCharClick(c) {
     return;
   }
   if (isMine) selectAttacker(c);
-  else if (c.isHero && c.owner === me) setHint("Это ваш герой. Атакуют ваши существа: нажмите на одно из них.");
+  else if (c.isHero && c.owner === me) {
+    if (canAttack(c)) selectAttacker(c);
+    else setHint(c.weapon ? "Герой уже ударил в этом ходу." : "Это ваш герой. Дайте ему оружие, чтобы он мог бить сам, или атакуйте существами.");
+  }
   else setHint("Сначала нажмите на своё существо, а потом на этого врага.");
 }
 
 function selectAttacker(m) {
+  if (m.isHero && !canAttack(m)) { setHint("Герой не может ударить: нужно оружие, и бить можно раз за ход."); return; }
   if (!canAttack(m)) {
     if (m.attack <= 0) setHint(m.def.name + " не может атаковать: у него 0 атаки.");
     else if (m.attacksDone > 0) setHint(m.def.name + " уже атаковал в этом ходу.");
@@ -1860,11 +2283,13 @@ function newCodeFor(bi) {
 const otherSide = s => (s === "host" ? "guest" : "host");
 function encTarget(c) {
   if (!c) return null;
+  if (c.isNeutral) return { s: "n", i: 0 };
   const mine = c.owner === game.human;
   return { s: mine ? NET.side : otherSide(NET.side), i: c.isHero ? -1 : c.owner.board.indexOf(c) };
 }
 function decTarget(t) {
   if (!t) return null;
+  if (t.s === "n") return game.neutral;
   const p = t.s === NET.side ? game.human : game.ai;
   return t.i < 0 ? p.hero : p.board[t.i] || null;
 }
@@ -1888,22 +2313,50 @@ function netLeave() {
   }
   NET.client = NET.code = NET.side = null;
   NET.started = false;
+  clearInterval(NET.syncTimer);
   online = false;
 }
 
+// Каждый ход нумеруется и хранится: если друг что-то пропустил (сеть моргнула, вкладка уснула),
+// он попросит переслать, и партия догонит сама
 function sendMove(m) {
   if (!online) return;
-  if (!netSend(Object.assign({ seq: NET.seq++, by: NET.side }, m))) setHint("Ход не отправился: связь с другом потеряна.");
+  const body = Object.assign({ seq: NET.seq++, by: NET.side }, m);
+  NET.sent.push(body);
+  if (!netSend(body)) setHint("Ход не отправился: связь с другом потеряна, пробуем ещё раз.");
+}
+
+function requestResend() {
+  const now = Date.now();
+  if (now - (NET.askedAt || 0) < 1500) return;
+  NET.askedAt = now;
+  netSend({ t: "resend", from: NET.rseq, by: NET.side });
+}
+
+function acceptMove(msg) {
+  if (msg.seq < NET.rseq) return; // повтор
+  if (msg.seq > NET.rseq) { NET.pending.set(msg.seq, msg); requestResend(); return; } // дыра в нумерации
+  NET.rseq = msg.seq + 1;
+  applyRemote(msg);
+  while (NET.pending.has(NET.rseq)) {
+    const next = NET.pending.get(NET.rseq);
+    NET.pending.delete(NET.rseq);
+    NET.rseq++;
+    applyRemote(next);
+  }
 }
 
 // Ходы друга применяются строго по очереди, с теми же анимациями, что у бота
 function applyRemote(m) {
-  NET.chain = NET.chain.then(async () => {
+  NET.chain = NET.chain.catch(() => {}).then(async () => {
     if (!game || game.over || !online) return;
     const foe = game.ai;
     if (m.t === "play") game.playCard(foe, m.i, decTarget(m.tg));
     else if (m.t === "power") game.usePower(foe, decTarget(m.tg));
-    else if (m.t === "attack") game.attack(foe.board[m.a], decTarget(m.tg));
+    else if (m.t === "attack") game.attack(m.a < 0 ? foe.hero : foe.board[m.a], decTarget(m.tg));
+    else if (m.t === "ult") game.useUlt(foe, decTarget(m.tg));
+    else if (m.t === "rune") game.takeRune(foe);
+    else if (m.t === "mull") { game.mulligan(foe, m.idx || []); NET.foeMull = true; tryBeginOnline(); return; }
     else if (m.t === "end") game.endTurn();
     if (revealPending) { revealPending = false; await sleep(900); }
     animating = true;
@@ -1936,11 +2389,15 @@ function onNetData(msg) {
     setHint("Друг вышел из игры. Вернитесь в меню и начните заново.");
     return;
   }
-  if (typeof msg.seq === "number" && msg.by && msg.by !== NET.side && online) {
-    if (msg.seq < NET.seq) return; // повтор
-    NET.seq = msg.seq + 1;
-    applyRemote(msg);
+  if (msg.t === "resend" && msg.by !== NET.side && online) {
+    for (const b of NET.sent) if (b.seq >= msg.from) netSend(b);
+    return;
   }
+  if (msg.t === "sync" && msg.by !== NET.side && online) {
+    if (msg.sent > NET.rseq) requestResend();
+    return;
+  }
+  if (typeof msg.seq === "number" && msg.by && msg.by !== NET.side && online) acceptMove(msg);
 }
 
 // Подключение к серверу; «завещание» сообщит другу, если вкладка закроется без выхода
@@ -1971,6 +2428,7 @@ function attachClient(client, id, code) {
     else if (topic.endsWith("/lobby")) NET.lobbySeen = msg;
   });
   client.on("offline", () => { if (online && game && !game.over) setHint("Пропала связь, переподключаемся…"); });
+  client.on("connect", () => { if (online) { NET.askedAt = 0; requestResend(); } }); // после переподключения догоняем партию
   client.on("reconnect", () => {});
 }
 
@@ -1979,6 +2437,13 @@ function startOnline(side, g) {
   const hostHero = byId(g.hostHero), guestHero = byId(g.guestHero);
   const iAmHost = side === "host";
   NET.seq = 0;
+  NET.rseq = 0;
+  NET.sent = [];
+  NET.pending = new Map();
+  NET.myMull = NET.foeMull = false;
+  // Сверка раз в 4 секунды: сколько ходов я отправил — друг поймёт, если что-то потерял
+  clearInterval(NET.syncTimer);
+  NET.syncTimer = setInterval(() => { if (online) netSend({ t: "sync", sent: NET.seq, by: NET.side }); }, 4000);
   NET.chain = Promise.resolve();
   online = true;
   const deckHost = seededRng(g.seed + 1), deckGuest = seededRng(g.seed + 2);
@@ -1987,6 +2452,7 @@ function startOnline(side, g) {
     aiDeck: iAmHost ? deckGuest : deckHost,
     humanFirst: iAmHost === !!g.hostFirst,
     foeName: "Друг",
+    mulligan: true,
   });
   $("lobby").hidden = true;
   $("logList").innerHTML = "";
@@ -2000,6 +2466,22 @@ function startOnline(side, g) {
   if (MID.ok) MID.attach($("map3d"), "game");
   SND.playMusic("game");
   game.start();
+  game.fxQueue.length = 0;
+  render();
+  showMulligan(sel => {
+    game.mulligan(game.human, sel);
+    sendMove({ t: "mull", idx: sel });
+    NET.myMull = true;
+    if (!NET.foeMull) { $("mullDone").hidden = true; $("mullWait").hidden = false; $("mulligan").hidden = false; }
+    tryBeginOnline();
+  });
+}
+
+// Партия начинается, когда оба игрока заменили карты
+function tryBeginOnline() {
+  if (!NET.myMull || !NET.foeMull || game.current) return;
+  $("mulligan").hidden = true;
+  game.begin();
   game.fxQueue.length = 0;
   render();
   showBanner(game.current === game.human ? "Ваш ход" : "Ходит друг");
@@ -2328,6 +2810,44 @@ const SND = {
       this.noise({ t: .05, f: 3000, f2: 200, dur: 1, vol: .5, verb: .4 });
       for (let i = 0; i < 8; i++) this.noise({ t: .1 + Math.random() * .6, type: "highpass", f: 3000, dur: .04, vol: .1 });
     },
+    rune() {
+      [880, 1175, 1568, 2093].forEach((f, i) => this.tone({ f, t: i * .06, dur: .8, vol: .07, verb: .7 }));
+      this.noise({ type: "highpass", f: 5000, dur: .7, vol: .05, attack: .1, verb: .6 });
+    },
+    roshan() {
+      this.tone({ type: "sawtooth", f: 70, f2: 40, dur: 1.8, vol: .35, lp: 500, verb: .6 });
+      this.tone({ type: "sawtooth", f: 73, f2: 42, dur: 1.8, vol: .3, lp: 500 });
+      this.noise({ f: 600, f2: 120, dur: 1.6, vol: .45, attack: .1, verb: .5 });
+      this.boom(0, .9, 70);
+    },
+    aegis() {
+      for (const f of [523, 659, 784, 1047, 1319]) this.tone({ type: "triangle", f, dur: 2, vol: .07, attack: .08, verb: .8 });
+      this.tone({ f: 2093, t: .2, dur: 1.5, vol: .05, verb: .8 });
+    },
+    ultsplash() {
+      this.boom(0, 1, 80);
+      for (const f of [146.8, 220, 293.7, 349.2]) this.tone({ type: "sawtooth", f, dur: 1.8, vol: .06, attack: .05, lp: 1800, verb: .7 });
+      this.noise({ type: "bandpass", f: 300, f2: 3000, dur: .8, vol: .25 });
+    },
+    equip() {
+      this.noise({ type: "highpass", f: 3000, f2: 7000, dur: .35, vol: .2 });
+      this.tone({ type: "triangle", f: 1400, f2: 2200, dur: .6, vol: .08, verb: .6 });
+      this.tone({ f: 180, f2: 90, dur: .2, vol: .3 });
+    },
+    stun() {
+      this.boom(0, .6, 160);
+      this.tone({ type: "square", f: 2500, dur: .08, vol: .06 });
+      [1800, 2200, 1900].forEach((f, i) => this.tone({ f, t: .25 + i * .12, dur: .1, vol: .05 }));
+    },
+    sunstrike() {
+      this.tone({ type: "sine", f: 600, f2: 1800, dur: .35, vol: .06 });
+      this.noise({ t: .35, f: 4000, f2: 200, dur: 1.4, vol: .75, verb: .5 });
+      this.boom(.35, 1, 90);
+    },
+    dismember() {
+      for (let i = 0; i < 5; i++) { this.noise({ t: i * .13, f: 900, f2: 200, dur: .14, vol: .4 }); this.tone({ t: i * .13, f: 120, f2: 50, dur: .12, vol: .4 }); }
+      this.tone({ type: "sawtooth", f: 90, f2: 60, dur: 1, vol: .15, lp: 400, t: .1 });
+    },
     turn(o) {
       // Рог: две пилы квинтой через фильтр
       const base = o.mine ? 220 : 165;
@@ -2414,9 +2934,11 @@ const SND = {
 // Звук эффекта по id карты или силы героя, иначе по типу эффекта
 const SFX_BY_ID = { laguna: "laguna", finger: "finger", dagon: "zap", sniper: "shot", sf: "requiem", tango: "heal", dazzle: "heal",
   mom: "rage", heart: "heart", bkb: "bkb", drum: "drums", freezing: "freeze", wrath: "wrath", jugg: "blades", techies: "explode",
-  coin: "coin", pudge: "hook", invoker: "invoke", tinker: "robot" };
+  coin: "coin", pudge: "hook", invoker: "invoke", tinker: "robot", stormhammer: "stun",
+  ult_sf: "requiem", ult_invoker: "sunstrike", ult_pudge: "dismember", ult_tinker: "robot" };
 const SFX_BY_EFFECT = { damage: "zap", damageEnemyMinions: "explode", damageAllEnemies: "explode", heal: "heal", buff: "rage",
-  buffFriendly: "drums", giveShield: "bkb", destroy: "finger", draw: "draw", gainMana: "coin", steal: "hook" };
+  buffFriendly: "drums", giveShield: "bkb", destroy: "finger", draw: "draw", gainMana: "coin", steal: "hook",
+  damageStun: "stun", dismember: "dismember", rearm: "robot" };
 
 // ---------- Анимации эффектов ----------
 // Всё рисуется на холсте поверх стола: искры, угольки, молнии, ударные волны, дым и кровь.
@@ -2859,6 +3381,48 @@ async function lunge(f) {
 async function runFx(f) {
   if (f.effect === "attack") return lunge(f);
   if (f.effect === "death") { const p = ptOf(f.uid); if (p) deathFx(p, f.attr, f.big); return; }
+  if (f.effect === "ult_splash") return ultSplash(f);
+  if (f.effect === "rune_spawn" || f.effect === "rune_take") {
+    const p = centerOf($("riverMid")) || { x: innerWidth / 2, y: innerHeight / 2 }, col = RUNES[f.rune].color;
+    SND.play("rune");
+    flare(p.x, p.y, { color: col, size: 260, life: .7 });
+    shockwave(p.x, p.y, { color: col, r1: 160, width: 10 });
+    for (let i = 0; i < 24; i++) ember(p.x, p.y, { color: col, max: 220, size: 22 });
+    if (f.effect === "rune_take") {
+      label(p, RUNES[f.rune].name, col);
+      for (const uid of f.targets || []) { const q = ptOf(uid); if (q) auraFx(q, col); }
+    }
+    return wait(500);
+  }
+  if (f.effect === "roshan_spawn") {
+    SND.play("roshan");
+    flash("rgba(255, 60, 30, .7)", 700, .35);
+    shake(16);
+    showBanner("Рошан проснулся!");
+    return wait(900);
+  }
+  if (f.effect === "aegis_get" || f.effect === "aegis_use") {
+    const p = ptOf(f.caster);
+    SND.play("aegis");
+    if (f.effect === "aegis_use") flash("rgba(255, 230, 150, .9)", 800, .45);
+    if (p) {
+      flare(p.x, p.y, { color: "#ffd75a", size: 420, life: .9 });
+      shockwave(p.x, p.y, { color: "#ffe9a8", r1: 260, width: 18, life: .9 });
+      for (let i = 0; i < 40; i++) ember(p.x, p.y, { color: "#ffd75a", angle: -Math.PI / 2, spread: .9, min: 60, max: 260, size: 26 });
+      label(p, f.effect === "aegis_use" ? "Воскрешение!" : "Аегис!", "#ffe08a");
+    }
+    return wait(700);
+  }
+  if (f.effect === "weapon") {
+    const p = ptOf(f.caster);
+    SND.play("equip");
+    if (p) {
+      flare(p.x, p.y, { color: "#dfe6ff", size: 260, life: .5 });
+      for (let i = 0; i < 26; i++) spark(p.x, p.y, { color: "#e6ecff", max: 520, grav: 300 });
+      label(p, CARDS[f.id].name, "#e6ecff");
+    }
+    return wait(450);
+  }
   SND.play(SFX_BY_ID[f.id] || SFX_BY_EFFECT[f.effect], { n: f.value });
   const from = (f.srcUid && ptOf(f.srcUid)) || ptOf(f.caster);
   const pts = f.targets.map(ptOf).filter(Boolean);
@@ -2867,6 +3431,60 @@ async function runFx(f) {
   if (!from) return;
 
   switch (f.id) {
+    case "ult_sf": // Шадоурейзы: три взрыва-рейза по каждому врагу
+      flash("rgba(120, 0, 0, .85)", 700, .4);
+      await each(async p => {
+        for (let r = 0; r < 3; r++) {
+          await wait(110);
+          impact({ x: p.x + rand(-14, 14), y: p.y + rand(-10, 10) }, { color: "#ff1a1a", spark: "#ffa080", power: 1.5, blood: r === 2, smoke: "40, 0, 0" });
+        }
+      }, 50);
+      shake(14);
+      return;
+    case "ult_invoker": // Санстрайк: столб солнечного огня с неба
+      await each(async p => {
+        flare(p.x, p.y, { color: "#ffcf5a", size: 160, life: .6 });
+        await wait(250);
+        bolt({ x: p.x, y: -40 }, p, { color: "#ffb02e", width: 26, jag: 3, life: .8, segments: 8 });
+        bolt({ x: p.x, y: -40 }, p, { color: "#fff6c4", width: 9, jag: 2, life: .8, segments: 8 });
+        await wait(120);
+        flash("rgba(255, 200, 80, .9)", 400, .35);
+        impact(p, { color: "#ffb02e", spark: "#fff0a0", power: 2.6, smoke: true });
+        shake(15);
+      });
+      return;
+    case "ult_pudge": // Расчленение: кровавая мясорубка
+      await each(async p => {
+        for (let r = 0; r < 4; r++) {
+          await wait(130);
+          for (let i = 0; i < 18; i++) blood(p.x + rand(-20, 20), p.y + rand(-20, 20), { max: 600 });
+          shockwave(p.x, p.y, { color: "#ff2a1a", r1: 90 + r * 20, width: 10, life: .4 });
+          shake(5);
+        }
+        impact(p, { color: "#b30000", power: 2, blood: true });
+        const h = ptOf(f.caster);
+        if (h) { healFx(h, "#9aff5a"); label(h, "Расчленение!", "#ff6a4a"); }
+      });
+      return;
+    case "ult_tinker": { // Ребут: синяя перезарядка
+      const p = ptOf(f.caster);
+      flash("rgba(80, 180, 255, .8)", 600, .35);
+      if (p) {
+        for (let r = 0; r < 3; r++) setTimeout(() => shockwave(p.x, p.y, { color: "#5ad8ff", r0: 220, r1: 30, width: 12, life: .5 }), r * 150);
+        for (let i = 0; i < 40; i++) ember(p.x + rand(-80, 80), p.y + rand(-40, 40), { color: "#9fe8ff", angle: -Math.PI / 2, spread: .6, min: 60, max: 220, size: 22 });
+        label(p, "Ребут!", "#9fe8ff");
+      }
+      return wait(700);
+    }
+    case "stormhammer": // Буря молота: молот летит, бьёт и оглушает
+      await each(async p => {
+        await fly(from, p, { color: "#cfe0ff", trailColor: "#7aa8ff", size: 40, dur: .35, arc: 40 });
+        impact(p, { color: "#9fc8ff", spark: "#ffffff", power: 1.6 });
+        for (let i = 0; i < 6; i++) ember(p.x + rand(-30, 30), p.y - 30, { color: "#ffe066", min: 20, max: 60, size: 16, grav: 0 });
+        label(p, "Оглушён!", "#cfe0ff");
+        shake(7);
+      });
+      return;
     case "laguna": // Лагуна Блейд: огненный разряд, заряд в руке, взрыв и тряска
       flare(from.x, from.y, { color: "#ff5a1a", size: 260, life: .6 });
       for (let i = 0; i < 20; i++) ember(from.x, from.y, { color: "#ff7a2a", max: 220, size: 30 });
@@ -3054,13 +3672,29 @@ async function runFx(f) {
   }
 }
 
+// Заставка ультимейта: портрет героя и название на весь экран
+function ultSplash(f) {
+  const h = HEROES.find(x => x.id === f.hero);
+  const el = $("ultSplash");
+  el.style.setProperty("--hg", h ? h.glow : "#ffb347");
+  const art = ART["hero_" + f.hero];
+  $("usFace").style.backgroundImage = art ? `url('${art}')` : "";
+  $("usName").textContent = f.name;
+  el.classList.remove("show");
+  void el.offsetWidth;
+  el.classList.add("show");
+  SND.play("ultsplash");
+  shake(10);
+  return wait(1100);
+}
+
 async function playFx() {
   if (!game) return;
   const queue = game.fxQueue.splice(0);
   if (NO_MOTION) return;
   for (const f of queue) {
     // Игра ждёт главный момент эффекта, а хвосты частиц догорают сами
-    const limit = f.effect === "death" ? 220 : f.effect === "attack" ? 650 : 1100;
+    const limit = f.effect === "death" ? 220 : f.effect === "attack" ? 650 : f.effect === "ult_splash" ? 1150 : String(f.id).startsWith("ult_") ? 1500 : 1100;
     try { await Promise.race([runFx(f), wait(limit)]); } catch (e) { /* анимация не должна ломать игру */ }
   }
 }
@@ -3897,6 +4531,9 @@ $("game").addEventListener("click", e => {
   if (el.dataset.act === "hand") onHandClick(+el.dataset.i);
   else if (el.dataset.act === "char") onCharClick(findChar(+el.dataset.uid));
   else if (el.dataset.act === "power") onPowerClick();
+  else if (el.dataset.act === "ult") onUltClick();
+  else if (el.dataset.act === "hero") onCharClick(game.human.hero);
+  else if (el.dataset.act === "rune") onRuneClick();
 });
 
 $("game").addEventListener("keydown", e => {

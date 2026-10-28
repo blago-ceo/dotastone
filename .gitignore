@@ -1,0 +1,4 @@
+.claude/
+web/test.html
+__pycache__/
+*.pyc

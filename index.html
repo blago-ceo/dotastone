@@ -389,6 +389,17 @@ svg.map { filter: saturate(.6) brightness(.7); }
 @keyframes goIn { from { transform: scale(2.2); opacity: .2; filter: blur(10px); } }
 .go-sub { font-family: var(--display); font-size: clamp(18px, 2.4vw, 26px); color: #e8d6aa; text-shadow: 0 2px 0 #000; margin-top: -10px; }
 
+/* ---------- Sound button and power cooldown ---------- */
+.snd-btn { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 70; width: 42px; height: 42px; border: 0; border-radius: 50%; cursor: pointer; display: grid; place-items: center; color: var(--gold-hi); background: radial-gradient(circle at 40% 30%, #4a3a22, #15100a); box-shadow: 0 0 0 2px var(--gold-lo), 0 6px 14px rgba(0, 0, 0, .6); }
+.snd-btn:hover { box-shadow: 0 0 0 2px var(--gold), 0 0 16px rgba(233, 196, 106, .4); }
+.snd-btn svg { width: 22px; height: 22px; }
+.snd-btn .x { display: none; }
+.snd-btn.off { color: var(--muted); }
+.snd-btn.off .wave { display: none; }
+.snd-btn.off .x { display: block; }
+.pw-cd { position: absolute; inset: 12%; z-index: 3; border-radius: 50%; display: grid; place-items: center; background: rgba(0, 0, 0, .6); color: #fff; font-family: var(--display); font-size: 28px; text-shadow: 0 2px 0 #000; }
+.pw-cd-note { display: block; margin-top: 3px; font-style: normal; font-size: 11.5px; color: #ffb38a; }
+
 /* ---------- Online lobby ---------- */
 .lobby { max-width: 640px; text-align: center; align-items: center; }
 .lobby-hero { margin: -6px 0 0; color: var(--muted); }
@@ -503,6 +514,7 @@ svg.map { filter: saturate(.6) brightness(.7); }
   </aside>
 </main>
 
+<button class="snd-btn" id="sndBtn" aria-label="Выключить звук" title="Звук включён"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="wave" d="M16 8.5a4.5 4.5 0 0 1 0 7M18.6 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="x" d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
 <div id="banner"></div>
 <svg id="aim" aria-hidden="true" hidden>
   <defs><filter id="aimBlur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"/></filter></defs>
@@ -625,11 +637,11 @@ spell("finger", "Палец смерти", 5, "abil", "destroy", 0, "enemyMinion
 spell("wrath", "Гнев богов", 6, "abil", "damageEnemyMinions", 3, null, 0, "Нанесите 3 урона всем вражеским существам.");
 
 const HEROES = [
-  { id: "sf", name: "Шадоу Финд", color: "#5a1610", power: "Реквием душ", powerText: "Нанесите 2 урона всем вражеским существам.", effect: "damageEnemyMinions", value: 2, target: null,
+  { id: "sf", name: "Шадоу Финд", color: "#5a1610", power: "Реквием душ", powerText: "Нанесите 2 урона всем вражеским существам.", effect: "damageEnemyMinions", value: 2, target: null, cooldown: 3,
     tag: "Собиратель душ", glow: "#ff3a24", orbs: ["#ff2a1a", "#b30000", "#ff6a3a"] },
   { id: "invoker", name: "Инвокер", color: "#7a4a12", power: "Инвок", powerText: "Возьмите карту.", effect: "draw", value: 1, target: null,
     tag: "Повелитель заклинаний", glow: "#ffb347", orbs: ["#6fd8ff", "#c77dff", "#ff8a2a"] },
-  { id: "pudge", name: "Пудж", color: "#4c5a25", power: "Хук", powerText: "Притяните вражеское существо на свою сторону.", effect: "steal", value: 0, target: "enemyMinion", cost: 8,
+  { id: "pudge", name: "Пудж", color: "#4c5a25", power: "Хук", powerText: "Притяните вражеское существо на свою сторону.", effect: "steal", value: 0, target: "enemyMinion", cost: 8, cooldown: 3,
     tag: "Мясник", glow: "#9aff5a", orbs: ["#7dff4a", "#b6ff7a", "#4ad86a"] },
   { id: "tinker", name: "Тинкер", color: "#1f4f74", power: "Марш машин", powerText: "Призовите Робота 1/1.", effect: "summon", value: 1, target: null, token: "robot",
     tag: "Безумный изобретатель", glow: "#5ad8ff", orbs: ["#5ad8ff", "#ffe066", "#9fe8ff"] },
@@ -713,6 +725,7 @@ class Game {
     p.mana = p.maxMana;
     p.powerUsed = false;
     p.played = 0;
+    if (p.powerCd > 0) p.powerCd--; // перезарядка тикает в начале своего хода
     for (const m of p.board) { m.sleeping = false; m.attacksDone = 0; }
     this.say(p === this.human ? "Ваш ход" : "Ход противника", "turn");
     this.draw(p, 1);
@@ -760,7 +773,7 @@ class Game {
   }
 
   canUsePower(p) {
-    if (this.over || p !== this.current || p.powerUsed || p.mana < powerCost(p.hero.def)) return false;
+    if (this.over || p !== this.current || p.powerUsed || p.powerCd > 0 || p.mana < powerCost(p.hero.def)) return false;
     const h = p.hero.def;
     if ((h.effect === "summon" || h.effect === "steal") && p.board.length >= MAX_BOARD) return false;
     return !h.target || this.hasValidTarget(p, h.target);
@@ -772,6 +785,8 @@ class Game {
     if (h.target && !this.isValidTarget(p, h.target, target)) return false;
     p.mana -= powerCost(h);
     p.powerUsed = true;
+    // После силы с перезарядкой ждём столько своих ходов (снова доступна на третий ход после этого)
+    if (h.cooldown) p.powerCd = h.cooldown;
     this.say(p.name + ": сила героя «" + h.power + "»");
     this.fxSrc = { id: h.id };
     this.apply(p, h.effect, h.value, 0, h.token, target, h.power, -1);
@@ -1167,6 +1182,7 @@ function showBanner(text) {
   b.classList.remove("show");
   void b.offsetWidth; // перезапуск блика
   b.classList.add("show");
+  if (/^(Ваш ход|Ход противника|Ходит друг)/.test(text)) SND.play("turn", { mine: text.startsWith("Ваш") });
   clearTimeout(showBanner.t);
   showBanner.t = setTimeout(() => b.classList.remove("show"), 1100);
   // Вспышка и искры вокруг баннера
@@ -1203,7 +1219,7 @@ function heroPickHTML(h, i) {
       <div class="hp-power">
         ${ART["power_" + h.id] ? `<div class="pw-icon" style="background-image:url('${ART["power_" + h.id]}')"></div>` : ""}
         <div class="gem"><div class="stat mana" style="inset:0">${powerCost(h)}</div></div>
-        <div><b>${esc(h.power)}</b><span>${esc(h.powerText)}</span></div>
+        <div><b>${esc(h.power)}</b><span>${esc(h.powerText)}${h.cooldown ? " Перезарядка " + h.cooldown + " хода." : ""}</span></div>
       </div>
       <div class="hp-glare"></div>
     </div>
@@ -1240,6 +1256,7 @@ function showSelect() {
   $("heroList").innerHTML = HEROES.map(heroPickHTML).join("");
   if (MID.ok) MID.attach($("selBg"), "menu");
   menuAmbience();
+  SND.playMusic("menu");
 }
 
 // Выбор героя: вспышка, волна по фону, остальные гаснут, переход в игру
@@ -1248,6 +1265,7 @@ async function pickHero(btn) {
   picking = true;
   const h = HEROES[+btn.dataset.hero];
   btn.classList.add("chosen");
+  SND.play("pick");
   $("heroList").classList.add("choosing");
   const p = centerOf(btn.querySelector(".hp-art"));
   if (p) {
@@ -1279,6 +1297,7 @@ function startGame(hero) {
   $("select").hidden = true;
   $("game").hidden = false;
   if (MID.ok) MID.attach($("map3d"), "game");
+  SND.playMusic("game");
   game.start();
   game.fxQueue.length = 0;
   render();
@@ -1349,7 +1368,7 @@ function heroBarHTML(p) {
   if (!isHuman) powerCls = "enemy";
   else if (mode === "power") powerCls = "selected";
   else if (humanCanAct() && game.canUsePower(p)) powerCls = "ready";
-  if (p.powerUsed) powerCls += " used";
+  if (p.powerUsed || p.powerCd > 0) powerCls += " used";
 
   const mana = `<div class="mana-box">
       <div class="mana-num">${p.mana}/${p.maxMana}</div>
@@ -1369,8 +1388,9 @@ function heroBarHTML(p) {
         aria-label="Сила героя: ${esc(h.def.power)}. ${esc(h.def.powerText)}">
         <div class="stat mana">${powerCost(h.def)}</div>
         <div class="pw-letter">${esc(h.def.power[0])}</div>
+        ${p.powerCd > 0 ? `<div class="pw-cd" title="Перезарядка">${p.powerCd}</div>` : ""}
       </button>
-      <div class="power-label"><b>${esc(h.def.power)}</b>${esc(h.def.powerText)}</div>
+      <div class="power-label"><b>${esc(h.def.power)}</b>${esc(h.def.powerText)}${h.def.cooldown ? `<i class="pw-cd-note">${p.powerCd > 0 ? "Перезарядка: ещё " + p.powerCd + " " + (p.powerCd === 1 ? "ход" : "хода") : "Перезарядка " + h.def.cooldown + " хода"}</i>` : ""}</div>
     </div>`;
   return mana + portrait + power;
 }
@@ -1486,6 +1506,7 @@ document.addEventListener("pointermove", e => { mouse = { x: e.clientX, y: e.cli
 function flyCard(c, r, to, minion) {
   const wrap = document.createElement("div");
   wrap.className = "fly-card";
+  SND.play("card");
   wrap.innerHTML = cardHTML(c, "", "");
   Object.assign(wrap.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
   $("fx").appendChild(wrap);
@@ -1595,7 +1616,8 @@ function onPowerClick() {
   const me = game.human;
   resetMode();
   if (!game.canUsePower(me)) {
-    setHint(me.powerUsed ? "Сила героя уже использована в этом ходу." : "Для силы героя нужно " + powerCost(me.hero.def) + " маны.");
+    setHint(me.powerCd > 0 ? "Сила героя перезаряжается: ещё " + me.powerCd + " " + (me.powerCd === 1 ? "ход" : "хода") + "."
+      : me.powerUsed ? "Сила героя уже использована в этом ходу." : "Для силы героя нужно " + powerCost(me.hero.def) + " маны.");
     return;
   }
   if (me.hero.def.target) { mode = "power"; render(); return; }
@@ -1710,6 +1732,8 @@ function showGameOver() {
   else if (lost) { t.textContent = "Поражение"; t.className = "lose"; sub.textContent = game.ai.hero.def.name + " оказался сильнее"; }
   else { t.textContent = "Ничья"; t.className = ""; sub.textContent = "Оба героя пали"; }
   over.classList.toggle("lost", !won);
+  SND.stopMusic();
+  SND.play(won ? "win" : "lose");
   over.hidden = false;
   clearInterval(goTimer);
   if (NO_MOTION) return;
@@ -1893,6 +1917,7 @@ function startOnline(side, g) {
   $("select").hidden = true;
   $("game").hidden = false;
   if (MID.ok) MID.attach($("map3d"), "game");
+  SND.playMusic("game");
   game.start();
   game.fxQueue.length = 0;
   render();
@@ -1973,6 +1998,344 @@ function showPreview(id) {
   const c = CARDS[id];
   if (c) $("preview").innerHTML = cardHTML(c, "", "");
 }
+
+// ---------- Звук ----------
+// Музыка и все эффекты синтезируются на лету через Web Audio — без звуковых файлов.
+// Браузер разрешает звук только после первого нажатия, поэтому контекст создаётся в unlock().
+const SND = {
+  ctx: null, master: null, music: null, sfx: null, verb: null, noiseBuf: null,
+  on: true, musicMode: null, musicTimer: 0, musicBus: null, nextTime: 0, step: 0,
+
+  init() {
+    try { this.on = localStorage.getItem("dotastone-sound") !== "off"; } catch (e) {}
+    this.updateBtn();
+  },
+
+  unlock() {
+    if (this.ctx) { if (this.ctx.state === "suspended") this.ctx.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    const c = this.ctx = new AC();
+    const comp = c.createDynamicsCompressor();
+    comp.threshold.value = -16; comp.ratio.value = 4; comp.attack.value = .004; comp.release.value = .2;
+    comp.connect(c.destination);
+    this.master = c.createGain();
+    this.master.gain.value = this.on ? .85 : 0;
+    this.master.connect(comp);
+    this.music = c.createGain(); this.music.gain.value = .34; this.music.connect(this.master);
+    this.sfx = c.createGain(); this.sfx.gain.value = .95; this.sfx.connect(this.master);
+    // Ревербератор: искусственный «зал» для эпичности
+    this.verb = c.createConvolver();
+    this.verb.buffer = this.impulse(2.8);
+    const vg = c.createGain(); vg.gain.value = .4;
+    this.verb.connect(vg); vg.connect(this.master);
+    const len = c.sampleRate * 2, b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    this.noiseBuf = b;
+    if (this.musicMode) this.playMusic(this.musicMode, true);
+  },
+
+  impulse(sec) {
+    const c = this.ctx, n = Math.floor(c.sampleRate * sec), b = c.createBuffer(2, n, c.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = b.getChannelData(ch);
+      for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3.2);
+    }
+    return b;
+  },
+
+  toggle() {
+    this.on = !this.on;
+    try { localStorage.setItem("dotastone-sound", this.on ? "on" : "off"); } catch (e) {}
+    this.unlock();
+    if (this.master) this.master.gain.setTargetAtTime(this.on ? .85 : 0, this.ctx.currentTime, .05);
+    this.updateBtn();
+  },
+
+  updateBtn() {
+    for (const b of document.querySelectorAll(".snd-btn")) {
+      b.classList.toggle("off", !this.on);
+      b.setAttribute("aria-label", this.on ? "Выключить звук" : "Включить звук");
+      b.title = this.on ? "Звук включён" : "Звук выключен";
+    }
+  },
+
+  get ok() { return !!this.ctx && this.on && this.ctx.state === "running"; },
+
+  // ---- Кирпичики ----
+  tone(o) {
+    const c = this.ctx, at = (o.at != null ? o.at : c.currentTime) + (o.t || 0);
+    const dur = o.dur || .3, vol = o.vol || .2;
+    const osc = c.createOscillator();
+    osc.type = o.type || "sine";
+    osc.frequency.setValueAtTime(o.f || 440, at);
+    if (o.f2) osc.frequency.exponentialRampToValueAtTime(Math.max(20, o.f2), at + (o.glide || dur));
+    if (o.detune) osc.detune.value = o.detune;
+    const g = c.createGain();
+    g.gain.setValueAtTime(.0001, at);
+    g.gain.exponentialRampToValueAtTime(vol, at + (o.attack || .006));
+    g.gain.exponentialRampToValueAtTime(.0001, at + dur);
+    let node = osc;
+    if (o.lp) { const f = c.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = o.lp; f.Q.value = o.q || .7; node.connect(f); node = f; }
+    node.connect(g);
+    g.connect(o.out || this.sfx);
+    if (o.verb) { const s = c.createGain(); s.gain.value = o.verb; g.connect(s); s.connect(this.verb); }
+    osc.start(at);
+    osc.stop(at + dur + .05);
+  },
+
+  noise(o) {
+    const c = this.ctx, at = (o.at != null ? o.at : c.currentTime) + (o.t || 0);
+    const dur = o.dur || .3, vol = o.vol || .2;
+    const src = c.createBufferSource();
+    src.buffer = this.noiseBuf;
+    src.loop = true;
+    const f = c.createBiquadFilter();
+    f.type = o.type || "lowpass";
+    f.frequency.setValueAtTime(o.f || 1200, at);
+    if (o.f2) f.frequency.exponentialRampToValueAtTime(Math.max(30, o.f2), at + dur);
+    f.Q.value = o.q || .8;
+    const g = c.createGain();
+    g.gain.setValueAtTime(.0001, at);
+    g.gain.exponentialRampToValueAtTime(vol, at + (o.attack || .005));
+    g.gain.exponentialRampToValueAtTime(.0001, at + dur);
+    src.connect(f); f.connect(g); g.connect(o.out || this.sfx);
+    if (o.verb) { const s = c.createGain(); s.gain.value = o.verb; g.connect(s); s.connect(this.verb); }
+    src.start(at, Math.random() * 1.5);
+    src.stop(at + dur + .05);
+  },
+
+  boom(t = 0, vol = .7, f = 110) {
+    this.tone({ t, f, f2: 32, dur: .7, vol, glide: .5 });
+    this.noise({ t, f: 900, f2: 80, dur: .6, vol: vol * .6, verb: .3 });
+  },
+
+  play(name, opts) {
+    if (!this.ok) return;
+    const fx = this.fx[name];
+    if (fx) { try { fx.call(this, opts || {}); } catch (e) { /* звук не должен ломать игру */ } }
+  },
+
+  // ---- Эффекты ----
+  fx: {
+    ui() { this.tone({ f: 900, f2: 1300, dur: .07, vol: .07, type: "triangle" }); },
+    card() {
+      this.noise({ type: "bandpass", f: 500, f2: 3200, dur: .38, vol: .22, q: 1.2 });
+      this.tone({ type: "triangle", f: 320, f2: 760, dur: .3, vol: .06 });
+    },
+    summon(o) {
+      const big = o.big;
+      this.tone({ f: big ? 130 : 170, f2: 42, dur: big ? .8 : .45, vol: big ? .75 : .5, glide: .35 });
+      this.noise({ f: 500, f2: 120, dur: .3, vol: .3 });
+      for (const [f, t] of [[1320, .05], [1760, .12], [2640, .2]]) this.tone({ f, t, dur: .6, vol: .04, verb: .6 });
+      if (big) this.tone({ type: "triangle", f: 98, dur: 2, vol: .16, attack: .02, verb: .7 });
+    },
+    splash(o) {
+      const p = o.power || 1;
+      this.noise({ type: "bandpass", f: 1500, f2: 500, dur: .55, vol: .32 * p, q: .6 });
+      this.noise({ f: 400, f2: 120, dur: .3, vol: .3 * p });
+      for (let i = 0; i < 10; i++) this.tone({ t: .05 + Math.random() * .45, f: 900 + Math.random() * 1500, f2: 1600 + Math.random() * 1500, dur: .07, vol: .04 });
+    },
+    hit(o) {
+      const big = o.big;
+      this.noise({ f: 2600, f2: 260, dur: big ? .4 : .25, vol: big ? .6 : .45 });
+      this.tone({ f: big ? 110 : 150, f2: 40, dur: big ? .5 : .28, vol: big ? .8 : .55 });
+      this.tone({ type: "square", f: 1800 + Math.random() * 600, dur: .05, vol: .03 }); // лязг оружия
+    },
+    death() {
+      this.noise({ f: 1800, f2: 90, dur: .6, vol: .4 });
+      this.tone({ type: "sawtooth", f: 280, f2: 55, dur: .7, vol: .1, lp: 900 });
+      this.noise({ type: "highpass", f: 3500, dur: 1, vol: .05, attack: .2, verb: .8 }); // уходящая душа
+    },
+    zap() {
+      this.tone({ type: "sawtooth", f: 1500, f2: 180, dur: .35, vol: .16, lp: 4000 });
+      this.noise({ type: "highpass", f: 3000, dur: .22, vol: .15 });
+      this.boom(.15, .45, 140);
+    },
+    shot() {
+      this.noise({ type: "highpass", f: 2000, dur: .08, vol: .5 });
+      this.tone({ f: 240, f2: 60, dur: .2, vol: .45 });
+      this.tone({ type: "sine", f: 3000, f2: 2200, dur: .3, vol: .03, t: .05, verb: .5 }); // рикошет
+    },
+    laguna() {
+      this.noise({ type: "bandpass", f: 200, f2: 2600, dur: .5, vol: .28, q: 2 });
+      this.tone({ type: "sawtooth", f: 60, f2: 240, dur: .5, vol: .1, lp: 1500 });
+      this.noise({ t: .3, f: 3200, f2: 160, dur: 1.4, vol: .7, verb: .5 });
+      this.tone({ t: .3, type: "sawtooth", f: 95, f2: 36, dur: 1.4, vol: .3, lp: 700, verb: .4 });
+      for (let i = 0; i < 12; i++) this.noise({ t: .3 + Math.random() * .8, type: "highpass", f: 4000, dur: .03, vol: .15 });
+    },
+    bolt() {
+      for (let i = 0; i < 16; i++) this.noise({ t: Math.random() * .35, type: "highpass", f: 2500 + Math.random() * 3000, dur: .03 + Math.random() * .04, vol: .22 });
+      this.noise({ t: .1, f: 900, f2: 60, dur: 1.8, vol: .65, verb: .6 });
+      this.tone({ t: .1, f: 70, f2: 30, dur: 1.2, vol: .5 });
+    },
+    finger() {
+      this.fx.bolt.call(this);
+      this.tone({ type: "sawtooth", f: 220, f2: 110, dur: 1.2, vol: .07, lp: 1200, verb: .7 });
+      this.tone({ type: "sawtooth", f: 330, f2: 165, dur: 1.2, vol: .05, lp: 1200, verb: .7 });
+    },
+    wrath() {
+      this.fx.bolt.call(this);
+      this.fx.bolt.call(this);
+    },
+    freeze() {
+      this.noise({ type: "highpass", f: 1800, f2: 600, dur: 1.4, vol: .22, attack: .2 });
+      for (let i = 0; i < 16; i++) this.tone({ t: Math.random() * .9, f: 1600 + Math.random() * 3000, dur: .5, vol: .05, verb: .6 });
+      this.tone({ type: "triangle", f: 880, f2: 220, dur: 1.2, vol: .06, verb: .5 });
+    },
+    heal() {
+      [523, 659, 784, 1047].forEach((f, i) => this.tone({ type: "triangle", f, t: i * .07, dur: .7, vol: .1, verb: .6 }));
+      this.noise({ type: "highpass", f: 5000, dur: .8, vol: .03, attack: .2, verb: .5 });
+    },
+    rage() {
+      this.tone({ type: "sawtooth", f: 120, f2: 70, dur: .6, vol: .25, lp: 600 });
+      this.tone({ type: "sawtooth", f: 123, f2: 72, dur: .6, vol: .2, lp: 600 });
+      this.noise({ f: 700, f2: 200, dur: .5, vol: .25 });
+    },
+    heart() {
+      for (const t of [0, .24, .9, 1.14]) this.tone({ t, f: 75, f2: 38, dur: .28, vol: .8 });
+      this.tone({ type: "triangle", f: 440, t: .3, dur: 1.2, vol: .05, verb: .7 });
+    },
+    drums() {
+      for (const [t, f] of [[0, 120], [.18, 100], [.36, 140], [.54, 90]]) {
+        this.tone({ t, f, f2: 50, dur: .35, vol: .6 });
+        this.noise({ t, f: 600, dur: .12, vol: .2 });
+      }
+    },
+    bkb() {
+      this.noise({ type: "bandpass", f: 300, f2: 3000, dur: .5, vol: .2 });
+      [523, 659, 784, 1047, 1319].forEach((f, i) => this.tone({ type: "triangle", f, t: .1 + i * .03, dur: 1.4, vol: .06, attack: .05, verb: .7 }));
+    },
+    coin() {
+      this.tone({ f: 1568, dur: .6, vol: .14 });
+      this.tone({ f: 2093, t: .06, dur: .5, vol: .1 });
+      this.tone({ f: 3136, t: .1, dur: .3, vol: .04 });
+    },
+    draw(o) {
+      for (let i = 0; i < (o.n || 1); i++) this.noise({ t: i * .16, type: "bandpass", f: 2500, f2: 5000, dur: .14, vol: .14, q: 1.5 });
+    },
+    invoke() {
+      [440, 554, 659].forEach((f, i) => this.tone({ type: "sine", f, f2: f * 2, t: i * .09, dur: .35, vol: .12, verb: .6 }));
+      this.noise({ type: "highpass", f: 4000, t: .25, dur: .5, vol: .06, verb: .5 });
+      this.fx.draw.call(this, { n: 1 });
+    },
+    robot() {
+      [220, 330, 440, 294].forEach((f, i) => this.tone({ type: "square", f, t: i * .07, dur: .08, vol: .05, lp: 2500 }));
+      this.noise({ type: "bandpass", f: 900, f2: 2400, t: .3, dur: .35, vol: .12, q: 4 }); // сервопривод
+      this.tone({ t: .35, f: 150, f2: 60, dur: .3, vol: .4 });
+    },
+    hook() {
+      this.noise({ type: "bandpass", f: 400, f2: 2000, dur: .35, vol: .25 }); // бросок
+      for (let i = 0; i < 12; i++) this.tone({ t: .05 + i * .03, type: "square", f: 2200 + Math.random() * 1600, dur: .025, vol: .05 }); // цепь
+      this.tone({ t: .36, f: 95, f2: 38, dur: .35, vol: .85 }); // крюк впился
+      this.noise({ t: .36, f: 700, f2: 150, dur: .3, vol: .5 });
+      for (let i = 0; i < 12; i++) this.tone({ t: .62 + i * .028, type: "square", f: 1800 + Math.random() * 1400, dur: .025, vol: .05 });
+      this.noise({ t: .6, type: "bandpass", f: 2000, f2: 400, dur: .45, vol: .22 }); // тащит обратно
+    },
+    requiem() {
+      this.tone({ f: 55, f2: 28, dur: 2.4, vol: .9, glide: 1.6 });
+      for (const f of [110, 117, 165, 233]) this.tone({ type: "sawtooth", f, dur: 2.2, vol: .05, attack: .3, lp: 900, verb: .8 });
+      this.noise({ type: "bandpass", f: 250, f2: 1600, dur: 1.8, vol: .3, attack: .3, verb: .6 }); // вой душ
+      this.boom(.25, .8, 90);
+    },
+    blades() {
+      for (let i = 0; i < 4; i++) this.noise({ t: i * .11, type: "bandpass", f: 900, f2: 3500, dur: .14, vol: .22, q: 2 });
+      this.tone({ type: "triangle", f: 2400, t: .4, dur: .8, vol: .04, verb: .6 });
+    },
+    explode() {
+      this.boom(0, .9, 100);
+      this.noise({ t: .05, f: 3000, f2: 200, dur: 1, vol: .5, verb: .4 });
+      for (let i = 0; i < 8; i++) this.noise({ t: .1 + Math.random() * .6, type: "highpass", f: 3000, dur: .04, vol: .1 });
+    },
+    turn(o) {
+      // Рог: две пилы квинтой через фильтр
+      const base = o.mine ? 220 : 165;
+      for (const [f, d] of [[base, 0], [base * 1.5, 4], [base * 2, -4]]) this.tone({ type: "sawtooth", f, dur: 1.1, vol: .07, attack: .09, lp: o.mine ? 1600 : 900, detune: d, verb: .5 });
+      if (o.mine) this.tone({ type: "triangle", f: base * 3, t: .25, dur: .7, vol: .04, verb: .6 });
+    },
+    pick() {
+      this.boom(0, .9, 90);
+      for (const f of [220, 277, 330, 440]) this.tone({ type: "sawtooth", f, dur: 2.6, vol: .05, attack: .25, lp: 1400, verb: .8 });
+      this.noise({ type: "highpass", f: 3000, dur: 1.5, vol: .06, attack: .1, verb: .7 });
+    },
+    win() {
+      [392, 523, 659, 784, 1047].forEach((f, i) => this.tone({ type: "triangle", f, t: i * .12, dur: .5, vol: .12, verb: .5 }));
+      for (const f of [523, 659, 784, 1047]) this.tone({ type: "sawtooth", f, t: .6, dur: 2.4, vol: .05, attack: .1, lp: 2200, verb: .7 });
+      this.boom(.6, .6, 120);
+    },
+    lose() {
+      [330, 311, 294, 247].forEach((f, i) => this.tone({ type: "sawtooth", f, t: i * .3, dur: .9, vol: .08, lp: 900, verb: .6 }));
+      this.tone({ f: 55, t: 1.2, dur: 2.5, vol: .6 });
+    },
+  },
+
+  // ---- Музыка: медленный фэнтези-эмбиент в ля миноре; в бою добавляются боевые барабаны ----
+  playMusic(mode, force) {
+    if (this.musicMode === mode && !force && this.musicTimer) return;
+    this.musicMode = mode;
+    if (!this.ctx) return;
+    this.stopMusic();
+    const c = this.ctx;
+    const bus = this.musicBus = c.createGain();
+    bus.gain.setValueAtTime(.0001, c.currentTime);
+    bus.gain.exponentialRampToValueAtTime(1, c.currentTime + 2.5);
+    bus.connect(this.music);
+    this.nextTime = c.currentTime + .1;
+    this.step = 0;
+    this.melodyNote = 4;
+    this.musicTimer = setInterval(() => {
+      if (!this.ctx) return;
+      while (this.nextTime < this.ctx.currentTime + .7) {
+        this.musicStep(this.step, this.nextTime, bus);
+        this.nextTime += this.beat();
+        this.step++;
+      }
+    }, 150);
+  },
+
+  stopMusic() {
+    clearInterval(this.musicTimer);
+    this.musicTimer = 0;
+    const old = this.musicBus;
+    if (old && this.ctx) {
+      old.gain.setTargetAtTime(.0001, this.ctx.currentTime, .4);
+      setTimeout(() => { try { old.disconnect(); } catch (e) {} }, 2500);
+    }
+    this.musicBus = null;
+  },
+
+  beat() { return 60 / (this.musicMode === "game" ? 84 : 70) / 2; }, // восьмые
+
+  musicStep(step, at, out) {
+    const CHORDS = [[220, 261.6, 329.6], [174.6, 220, 261.6], [196, 246.9, 293.7], [164.8, 196, 246.9]]; // Am F G Em
+    const SCALE = [220, 261.6, 293.7, 329.6, 392, 440, 523.3, 587.3, 659.3]; // ля минорная пентатоника
+    const bar = Math.floor(step / 16) % 4, pos = step % 16, len = this.beat() * 16;
+    if (pos === 0) {
+      for (const f of CHORDS[bar]) this.tone({ at, out, type: "triangle", f, dur: len * 1.05, vol: .045, attack: 1.4, lp: 1300, verb: .5 });
+      this.tone({ at, out, type: "sine", f: CHORDS[bar][0] / 2, dur: len, vol: .1, attack: .8 });
+      this.tone({ at, out, type: "sawtooth", f: CHORDS[bar][0] / 4, dur: len, vol: .035, attack: 1.5, lp: 300 });
+    }
+    // Мелодия «арфы»: случайное блуждание по пентатонике
+    if (pos % 2 === 0 && Math.random() < (this.musicMode === "game" ? .5 : .42)) {
+      this.melodyNote = Math.max(0, Math.min(SCALE.length - 1, this.melodyNote + Math.floor(Math.random() * 5) - 2));
+      const f = SCALE[this.melodyNote];
+      this.tone({ at, out, type: "triangle", f, dur: 1.3, vol: .05, verb: .6 });
+      this.tone({ at, out, type: "sine", f: f * 2, dur: .5, vol: .012, verb: .6 });
+    }
+    if (this.musicMode === "game") {
+      if (pos % 8 === 0) { this.tone({ at, out, f: 92, f2: 44, dur: .4, vol: .32 }); this.noise({ at, out, f: 500, dur: .1, vol: .08 }); }
+      if (pos % 8 === 3 || pos % 8 === 6) this.tone({ at, out, f: 70, f2: 40, dur: .3, vol: .16 });
+      if (pos % 4 === 2) this.noise({ at, out, type: "highpass", f: 7000, dur: .04, vol: .02 });
+    }
+  },
+};
+
+// Звук эффекта по id карты или силы героя, иначе по типу эффекта
+const SFX_BY_ID = { laguna: "laguna", finger: "finger", dagon: "zap", sniper: "shot", sf: "requiem", tango: "heal", dazzle: "heal",
+  mom: "rage", heart: "heart", bkb: "bkb", drum: "drums", freezing: "freeze", wrath: "wrath", jugg: "blades", techies: "explode",
+  coin: "coin", pudge: "hook", invoker: "invoke", tinker: "robot" };
+const SFX_BY_EFFECT = { damage: "zap", damageEnemyMinions: "explode", damageAllEnemies: "explode", heal: "heal", buff: "rage",
+  buffFriendly: "drums", giveShield: "bkb", destroy: "finger", draw: "draw", gainMana: "coin", steal: "hook" };
 
 // ---------- Анимации эффектов ----------
 // Всё рисуется на холсте поверх стола: искры, угольки, молнии, ударные волны, дым и кровь.
@@ -2318,6 +2681,7 @@ function splash(p, power = 1) {
 // Появление существа: всплеск, если рядом река, иначе пыль
 function dust(p, col = "#ffd75a") {
   const wet = MID.land(p);
+  SND.play(wet ? "splash" : "summon", { big: col === "#ffd75a", power: 1.2 });
   shockwave(p.x, p.y + 20, { color: wet ? "#bfeaff" : col, r1: 70, width: 6, life: .45 });
   if (!wet) {
     for (let i = 0; i < 16; i++) ember(p.x + rand(-40, 40), p.y + rand(-10, 40), { color: col, angle: -Math.PI / 2, spread: .6, min: 40, max: 140, size: 16 });
@@ -2356,6 +2720,7 @@ function deathFx(p, attr, big) {
     },
   });
   if (big) shake(9);
+  SND.play("death");
   MID.impact(p, big ? 1.8 : 1.1);
 }
 
@@ -2402,6 +2767,7 @@ async function lunge(f) {
   for (let i = 0; i < 4; i++) setTimeout(() => { const p = centerOf(el); if (p) ember(p.x, p.y, { color: "#ffd28a", max: 30, size: 30, grav: 0, lifeMax: .5 }); }, 140 + i * 40);
   await wait(320);
   const hitPt = { x: a.x + dx * .9, y: a.y + dy * .9 };
+  SND.play("hit", { big: f.big });
   impact(hitPt, { color: f.big ? "#ff7a1a" : "#ffc861", power: f.big ? 1.6 : 1.05, blood: true });
   shake(f.big ? 11 : 5);
   await anim.finished.catch(() => {});
@@ -2412,6 +2778,7 @@ async function lunge(f) {
 async function runFx(f) {
   if (f.effect === "attack") return lunge(f);
   if (f.effect === "death") { const p = ptOf(f.uid); if (p) deathFx(p, f.attr, f.big); return; }
+  SND.play(SFX_BY_ID[f.id] || SFX_BY_EFFECT[f.effect], { n: f.value });
   const from = (f.srcUid && ptOf(f.srcUid)) || ptOf(f.caster);
   const pts = f.targets.map(ptOf).filter(Boolean);
   const handPt = centerOf(f.mine ? $("hand") : $("enemyHand"));
@@ -3469,14 +3836,19 @@ document.addEventListener("keydown", e => {
   else if (mode !== "idle") { resetMode(); render(); }
 });
 
-$("endTurn").addEventListener("click", onEndTurn);
+$("endTurn").addEventListener("click", () => { SND.play("ui"); onEndTurn(); });
+// Звук: браузер включает его только после первого нажатия
+SND.init();
+document.addEventListener("pointerdown", () => SND.unlock(), true);
+document.addEventListener("keydown", () => SND.unlock(), true);
+$("sndBtn").addEventListener("click", () => SND.toggle());
 $("cancelBtn").addEventListener("click", () => { resetMode(); render(); });
 $("againBtn").addEventListener("click", showSelect);
 $("logToggle").addEventListener("click", () => $("rail").classList.toggle("open"));
 window.addEventListener("resize", () => { if (game) fitHand(); });
 
 // Для проверки правил из консоли
-window.DotaStone = { Game, AI, HEROES, CARDS, MID, get game() { return game; }, render: () => render() };
+window.DotaStone = { Game, AI, HEROES, CARDS, MID, SND, get game() { return game; }, render: () => render() };
 
 showSelect();
 })();

@@ -739,6 +739,7 @@ svg.map { filter: saturate(.6) brightness(.7); }
       <div class="diff" id="modeSel" role="group" aria-label="Режим">
         <button class="on" data-mode="bot">Против бота</button>
         <button data-mode="online">С другом онлайн</button>
+        <button data-mode="coop">Кооп</button>
         <button data-mode="story">Сюжет</button>
         <button data-mode="run">Забег</button>
         <button data-mode="daily">Испытание дня</button>
@@ -1103,6 +1104,14 @@ class Game {
     if (opts.heroHp) for (const p of [this.human, this.ai]) p.hero.health = p.hero.maxHealth = opts.heroHp;
     if (opts.aiHp) this.ai.hero.health = this.ai.hero.maxHealth = opts.aiHp;
     if (opts.humanHp) this.human.hero.health = Math.min(this.human.hero.maxHealth, opts.humanHp);
+    // Кооп: у команды общий стол и герой, а рука, колода, сила и ульта у каждого свои — меняются каждый ход команды
+    this.coop = null;
+    if (opts.coop) {
+      const c = opts.coop, deck = buildDeck(c.deckRng, c.list);
+      this.coop = { cur: 0, started: false, seats: [null, { name: c.name || "Друг", def: c.hero, avatar: c.avatar || null, deck, hand: deck.splice(0, 4),
+        fatigue: 0, powerUsed: false, powerCd: 0, ultUsed: false }] };
+      this.human.hero.health = this.human.hero.maxHealth = c.hp || 40;
+    }
     this.human.opp = this.ai;
     this.ai.opp = this.human;
     this.current = null;
@@ -1160,7 +1169,21 @@ class Game {
     this.startTurn(this.first);
   }
 
+  coopRotate() {
+    const c = this.coop, p = this.human;
+    if (!c.started) { c.started = true; return; }
+    const keys = ["name", "deck", "hand", "fatigue", "powerUsed", "powerCd", "ultUsed", "avatar"];
+    const save = { def: p.hero.def };
+    for (const k of keys) save[k] = p[k];
+    c.seats[c.cur] = save;
+    c.cur = 1 - c.cur;
+    const next = c.seats[c.cur];
+    for (const k of keys) p[k] = next[k];
+    p.hero.def = next.def;
+  }
+
   startTurn(p) {
+    if (this.coop && p === this.human) this.coopRotate();
     this.turnNo++;
     p.maxMana = Math.min(MAX_MANA, p.maxMana + 1);
     p.mana = p.maxMana;
@@ -1765,7 +1788,9 @@ function showReveal(c) {
 }
 
 let animating = false;
-function humanCanAct() { return !!game && !game.over && game.current === game.human && !aiBusy && !animating; }
+function humanCanAct() { return !!game && !game.over && game.current === game.human && !aiBusy && !animating && coopMine(); }
+// В коопе ход команды принадлежит одному из двоих: хозяин — первое место, гость — второе
+function coopMine() { return !game || !game.coop || !online || game.coop.cur === (NET.side === "host" ? 0 : 1); }
 function resetMode() { mode = "idle"; pending = -1; attacker = null; }
 
 // Картинка или заглушка с первой буквой
@@ -2112,7 +2137,7 @@ function riverHTML() {
 
 function defaultStatus() {
   if (game.over) return "";
-  if (!humanCanAct()) return online ? "Ходит друг…" : "Противник думает…";
+  if (!humanCanAct()) return online ? (game.coop && game.current === game.ai ? "Ходит босс…" : "Ходит друг…") : "Противник думает…";
   if (mode === "card") return "Теперь нажмите на цель с оранжевым свечением для «" + game.human.hand[pending].name + "».";
   if (mode === "power") return "Нажмите на цель с оранжевым свечением.";
   if (mode === "ult") return "Ультимейт: выберите цель с оранжевым свечением.";
@@ -2434,7 +2459,10 @@ function onEndTurn() {
   if (online) {
     sendMove({ t: "end" });
     afterAction();
-    if (!game.over) showBanner("Ходит друг");
+    if (!game.over) {
+      if (!NET.coop) showBanner("Ходит друг");
+      else { showBanner("Ход босса"); if (NET.side === "host") coopBossTurn(); }
+    }
     return;
   }
   if (game.over) { afterAction(); return; }
@@ -2506,6 +2534,23 @@ function showGameOver() {
     sub.textContent = dailyRecord(won);
     $("shareBtn").hidden = false;
     $("shareBtn").textContent = "Скопировать результат";
+  } else if (online && NET.coop) {
+    $("menuBtn").hidden = false;
+    const last = (NET.g.stage || 0) >= COOP_STAGES.length - 1;
+    NET.coopDone = won && last;
+    if (NET.coopDone) {
+      t.textContent = "Лиза повержена!";
+      sub.textContent = "Вы вдвоём отомстили за Старого Бога.";
+      $("againBtn").textContent = "Финал";
+      const you = NET.coopHero;
+      goNext = () => { netLeave(); playScene("ending", showSelect, you); };
+    } else if (NET.foeLeft) { sub.textContent = "Друг вышел из игры."; $("againBtn").textContent = "В меню"; }
+    else {
+      sub.textContent = won ? `Бой ${NET.g.stage + 1} из ${COOP_STAGES.length} выигран! Дальше: «${COOP_STAGES[NET.g.stage + 1].name}».` : "Команда пала. Попробуйте ещё раз вместе.";
+      if (NET.reMe) { $("againBtn").textContent = "Ждём друга…"; $("againBtn").disabled = true; }
+      else $("againBtn").textContent = NET.reFoe ? "Поехали" : won ? "Следующий бой" : "Ещё раз";
+      if (NET.reFoe && !NET.reMe) sub.textContent += " Друг уже готов.";
+    }
   } else if (online) {
     $("menuBtn").hidden = false;
     if (NET.foeLeft) { sub.textContent = "Друг вышел из игры."; $("againBtn").textContent = "В меню"; }
@@ -2562,12 +2607,14 @@ const otherSide = s => (s === "host" ? "guest" : "host");
 function encTarget(c) {
   if (!c) return null;
   if (c.isNeutral) return { s: "n", i: 0 };
+  if (NET.coop) return { s: c.owner === game.human ? "t" : "b", i: c.isHero ? -1 : c.owner.board.indexOf(c) };
   const mine = c.owner === game.human;
   return { s: mine ? NET.side : otherSide(NET.side), i: c.isHero ? -1 : c.owner.board.indexOf(c) };
 }
 function decTarget(t) {
   if (!t) return null;
   if (t.s === "n") return game.neutral;
+  if (t.s === "t" || t.s === "b") { const p = t.s === "t" ? game.human : game.ai; return t.i < 0 ? p.hero : p.board[t.i] || null; }
   const p = t.s === NET.side ? game.human : game.ai;
   return t.i < 0 ? p.hero : p.board[t.i] || null;
 }
@@ -2591,6 +2638,7 @@ function netLeave() {
   }
   NET.client = NET.code = NET.side = null;
   NET.started = false;
+  NET.coop = false;
   clearInterval(NET.syncTimer);
   online = false;
 }
@@ -2630,7 +2678,8 @@ function applyRemote(m) {
   const gn = NET.gn;
   NET.chain = NET.chain.catch(() => {}).then(async () => {
     if (!game || game.over || !online || gn !== NET.gn) return;
-    const foe = game.ai;
+    // В коопе ходы друга применяются к своей команде, ходы босса (от хозяина) — к боссу
+    const foe = NET.coop && m.who !== "boss" ? game.human : game.ai;
     if (m.t === "play") game.playCard(foe, m.i, decTarget(m.tg));
     else if (m.t === "power") game.usePower(foe, decTarget(m.tg));
     else if (m.t === "attack") game.attack(m.a < 0 ? foe.hero : foe.board[m.a], decTarget(m.tg));
@@ -2644,7 +2693,11 @@ function applyRemote(m) {
     animating = false;
     render();
     if (game.over) { showGameOver(); return; }
-    if (m.t === "end") showBanner("Ваш ход · мана " + game.human.mana);
+    if (m.t === "end") {
+      if (!NET.coop) showBanner("Ваш ход · мана " + game.human.mana);
+      else if (game.current === game.ai) { showBanner("Ход босса"); if (NET.side === "host") setTimeout(coopBossTurn, 0); }
+      else coopTurnBanner();
+    }
     await sleep(200);
   });
 }
@@ -2657,6 +2710,7 @@ function onNetData(msg) {
     NET.client.publish(topicBase(NET.code) + "/lobby", "", { qos: 1, retain: true }); // игра больше не ищется по коду
     const g = { seed: Math.floor(Math.random() * 2 ** 31), hostHero: NET.hero.id, guestHero: String(msg.hero), hostFirst: Math.random() < .5, guest: msg.from,
       hostDeck: myDeckActive(), guestDeck: cleanDeck(msg.deck), hostAv: myAvatar(), guestAv: safeAvatar(msg.av) };
+    if (NET.coopLobby) { g.coop = true; g.stage = 0; g.hostFirst = true; }
     netSend({ t: "start", g });
     startOnline("host", g);
     return;
@@ -2667,9 +2721,9 @@ function onNetData(msg) {
   }
   if (msg.t === "rematch" && msg.by !== NET.side && online && msg.gn === NET.gn) {
     NET.reFoe = true;
-    if (game && game.over && !NET.reMe) {
-      $("goSub").textContent = "Друг хочет реванш!";
-      $("againBtn").textContent = "Принять реванш";
+    if (game && game.over && !NET.reMe && !NET.coopDone) {
+      $("goSub").textContent = NET.coop ? "Друг готов, ждёт вас!" : "Друг хочет реванш!";
+      $("againBtn").textContent = NET.coop ? "Поехали" : "Принять реванш";
     }
     maybeRematch();
     return;
@@ -2685,6 +2739,7 @@ function onNetData(msg) {
   }
   if (msg.t === "bye" && online && game) {
     NET.foeLeft = true;
+    if (NET.coopDone) return; // друг уже смотрит финал
     if (!game.over) setHint("Друг вышел из игры. Вернитесь в меню и начните заново.");
     else {
       $("goSub").textContent = "Друг вышел из игры.";
@@ -2738,6 +2793,8 @@ function attachClient(client, id, code) {
 }
 
 function startOnline(side, g) {
+  if (g.coop) { startCoop(side, g); return; }
+  NET.coop = false;
   const byId = id => HEROES.find(h => h.id === id) || HEROES[0];
   const hostHero = byId(g.hostHero), guestHero = byId(g.guestHero);
   const iAmHost = side === "host";
@@ -2806,6 +2863,7 @@ function requestRematch() {
 function maybeRematch() {
   if (NET.side !== "host" || !NET.reMe || !NET.reFoe || !NET.g) return;
   const g = Object.assign({}, NET.g, { seed: Math.floor(Math.random() * 2 ** 31), hostFirst: !NET.g.hostFirst, gn: NET.gn + 1 });
+  if (g.coop) g.stage = (NET.g.stage || 0) + (game && game.winner === game.human ? 1 : 0);
   netSend({ t: "start", g, re: true });
   startOnline("host", g);
 }
@@ -3160,11 +3218,11 @@ const ROPE = { key: "", start: 0, sec: 0 };
 function ropeTick() {
   const el = $("rope");
   if (!game || game.over || !game.current || $("game").hidden) { el.hidden = true; ROPE.key = ""; return; }
-  const mine = game.current === game.human;
+  const mine = game.current === game.human && coopMine();
   const key = game.turnNo + (mine ? ":me" : ":foe");
   if (key !== ROPE.key) { ROPE.key = key; ROPE.start = performance.now(); ROPE.sec = 0; }
   // Против бота горит только свой фитиль: бот и так ходит быстро
-  if (!mine && !online) { el.hidden = true; return; }
+  if (!mine && (!online || (game.coop && game.current === game.ai))) { el.hidden = true; return; }
   const left = TURN_TIME - (performance.now() - ROPE.start) / 1000;
   if (left > ROPE_TIME) { el.hidden = true; return; }
   el.hidden = false;
@@ -3253,7 +3311,7 @@ function mentorSay(kind, custom) {
 // Сравнивает стол с прошлой отрисовкой и комментирует, что изменилось
 function mentorWatch() {
   const el = $("mentor");
-  if (!game || $("game").hidden || mentorOffFor === game) { el.hidden = true; if (!game) MW = null; return; }
+  if (!game || $("game").hidden || !$("story").hidden || mentorOffFor === game) { el.hidden = true; if (!game) MW = null; return; }
   if (el.hidden) {
     el.hidden = false;
     $("mentorFace").style.backgroundImage = ART.story_old ? `url('${ART.story_old}')` : "";
@@ -3392,11 +3450,11 @@ function storyAfterMatch(won) {
 }
 
 // ---- Катсцены ----
-let SC = null;
+let SC = null, sceneYou = null;
 const SLOTS = ["L", "C", "R"];
 function actorInfo(key) {
   const a = ACTORS[key];
-  if (key === "you") { const h = storyHero(); return { name: h.name, url: myAvatar() || ART["hero_" + h.id], cls: "" }; }
+  if (key === "you") { const h = sceneYou || storyHero(); return { name: h.name, url: myAvatar() || ART["hero_" + h.id], cls: "" }; }
   return { name: a.name, url: ART[a.art], cls: a.cls || "" };
 }
 function setActor(slot, key) {
@@ -3469,7 +3527,8 @@ async function storyFx(name) {
   if (name === "lizaDown") { $("actorR").classList.add("fallen"); shake(8); return wait(400); }
 }
 
-function playScene(id, done) {
+function playScene(id, done, you) {
+  sceneYou = you || null;
   SC = { steps: SCENES[id], i: -1, done, slots: { L: null, C: null, R: null }, typing: 0, full: "", busy: false };
   for (const k of SLOTS) $("actor" + k).className = "actor slot-" + k + " off";
   $("mentor").hidden = true;
@@ -3521,6 +3580,125 @@ function sceneEnd() {
   SC = null;
   $("story").hidden = true;
   if (done) done();
+}
+
+// ======================= Кооп: вдвоём против боссов =======================
+const COOP_STAGES = [
+  { name: "Подручные Лизы", hp: 45, scene: "coop1", boss: () => HEROES[2], deck: null },
+  { name: "Рошан", hp: 60, scene: "coop2", boss: () => BOSS_HERO, deck: BOSS_DECK },
+  { name: "Лиза ССК", hp: 80, scene: "coop3", boss: () => LIZA_HERO, deck: LIZA_DECK },
+];
+SCENES.coop1 = [
+  { L: "old_spirit", C: "you", text: "Мид. Тишина. Над рекой мерцает дух Старого Бога." },
+  { say: "L", text: "Вас двое — это хорошо. Лиза слишком сильна для одного." },
+  { say: "L", text: "Стол и здоровье у вас общие, а карты и силы — свои. Ходите по очереди и прикрывайте друг друга." },
+  { say: "L", text: "Сначала её подручные. Вперёд!" },
+];
+SCENES.coop2 = [
+  { L: "old_spirit", C: "you", say: "L", text: "Лиза разбудила Рошана и спряталась за ним. Он бьёт больно — держите провокацию." },
+];
+SCENES.coop3 = [
+  { C: "you", R: "liza", fx: "appear", text: "Из невидимости выходит Лиза." },
+  { say: "R", text: "Двое на одну? Всё равно монеты мои." },
+  { L: "old_spirit", say: "L", text: "Вместе вы сильнее. Отомстите за меня!" },
+];
+
+function coopTurnBanner() {
+  if (!game || game.over) return;
+  if (game.current === game.ai) showBanner("Ход босса");
+  else if (coopMine()) showBanner("Ваш ход · мана " + game.human.mana);
+  else showBanner("Ходит друг");
+}
+
+// У хозяина бот за босса: каждый его шаг записывается и уходит другу до выполнения
+function coopRecordBoss(g) {
+  const wrap = (name, build) => {
+    const orig = g[name].bind(g);
+    g[name] = (...a) => { if (a[0] === g.ai) sendMove(Object.assign({ who: "boss" }, build(...a))); return orig(...a); };
+  };
+  wrap("playCard", (p, i, t) => ({ t: "play", i, tg: encTarget(t) }));
+  wrap("usePower", (p, t) => ({ t: "power", tg: encTarget(t) }));
+  wrap("useUlt", (p, t) => ({ t: "ult", tg: encTarget(t) }));
+  wrap("takeRune", () => ({ t: "rune" }));
+  const attack = g.attack.bind(g);
+  g.attack = (a, t) => {
+    if (a && a.owner === g.ai) sendMove({ who: "boss", t: "attack", a: a.isHero ? -1 : g.ai.board.indexOf(a), tg: encTarget(t) });
+    return attack(a, t);
+  };
+}
+
+async function coopBossTurn() {
+  const run = runId, gn = NET.gn;
+  if (!game || game.over || game.current !== game.ai || aiBusy || NET.side !== "host") return;
+  aiBusy = true;
+  render();
+  await sleep(1200);
+  for (let i = 0; i < 40 && !game.over; i++) {
+    if (run !== runId || gn !== NET.gn) return;
+    if (!AI.act(game, game.ai)) break;
+    if (revealPending) { revealPending = false; await sleep(900); }
+    if (run !== runId) return;
+    await playFx();
+    if (run !== runId) return;
+    render();
+    await sleep(650);
+  }
+  if (run !== runId || gn !== NET.gn) return;
+  if (!game.over) { sendMove({ who: "boss", t: "end" }); game.endTurn(); }
+  aiBusy = false;
+  afterAction();
+  coopTurnBanner();
+}
+
+function startCoop(side, g) {
+  const byId = id => HEROES.find(h => h.id === id) || HEROES[0];
+  const iAmHost = side === "host", st = COOP_STAGES[Math.min(g.stage || 0, COOP_STAGES.length - 1)];
+  NET.coop = true;
+  NET.coopDone = false;
+  NET.g = g;
+  NET.gn = g.gn || 0;
+  NET.reMe = NET.reFoe = NET.foeLeft = false;
+  runId++;
+  aiBusy = false;
+  $("gameover").hidden = true;
+  $("againBtn").disabled = false;
+  NET.seq = 0;
+  NET.rseq = 0;
+  NET.sent = [];
+  NET.pending = new Map();
+  clearInterval(NET.syncTimer);
+  NET.syncTimer = setInterval(() => { if (online) netSend({ t: "sync", sent: NET.seq, by: NET.side, gn: NET.gn }); }, 4000);
+  NET.chain = Promise.resolve();
+  online = true;
+  matchMode = "coop";
+  const hostHero = byId(g.hostHero), guestHero = byId(g.guestHero);
+  NET.coopHero = iAmHost ? hostHero : guestHero;
+  game = new Game(hostHero, st.boss(), addLog, {
+    humanDeck: seededRng(g.seed + 1), humanList: cleanDeck(g.hostDeck) || undefined,
+    aiDeck: seededRng(g.seed + 3), aiList: st.deck || undefined,
+    humanFirst: true, foeName: st.name, mulligan: false, aiHp: st.hp,
+    coop: { hero: guestHero, deckRng: seededRng(g.seed + 2), list: cleanDeck(g.guestDeck) || undefined, avatar: safeAvatar(g.guestAv),
+      name: iAmHost ? "Друг" : "Вы", hp: 40 },
+  });
+  game.human.name = iAmHost ? "Вы" : "Друг";
+  game.human.avatar = safeAvatar(g.hostAv);
+  if (iAmHost) coopRecordBoss(game);
+  mentorIntro = null;
+  $("lobby").hidden = true;
+  $("logList").innerHTML = "";
+  game.onPlay = (p, c) => { if (p === game.ai) { showReveal(c); revealPending = true; } };
+  prevHp = new Map();
+  seenMinions = new Set();
+  resetMode();
+  clearInterval(menuTimer);
+  $("select").hidden = true;
+  $("game").hidden = false;
+  SND.playMusic("game");
+  game.start();
+  game.fxQueue.length = 0;
+  const go = () => { if (MID.ok) MID.attach($("map3d"), "game"); render(); coopTurnBanner(); };
+  render();
+  playScene(st.scene, go, iAmHost ? hostHero : guestHero);
 }
 
 // ---------- Предпросмотр ----------
@@ -5441,6 +5619,7 @@ function updateModeNote() {
   $("diff").hidden = playMode !== "bot";
   let t;
   if (playMode === "online") t = "Выберите героя, потом создайте игру и скажите другу код. Друг открывает эту же страницу и входит по коду.";
+  else if (playMode === "coop") t = "Вы с другом в одной команде против боссов: подручные Лизы, Рошан и сама Лиза ССК. Стол и здоровье общие, ходите по очереди. Выберите героя и создайте игру, друг входит по коду (у него может быть выбран любой режим).";
   else if (playMode === "run") {
     const r = runState();
     const h = r && HEROES.find(x => x.id === r.hero);
@@ -5519,7 +5698,7 @@ $("tutClose").addEventListener("click", closeTutorial);
 $("heroList").addEventListener("click", e => {
   const b = e.target.closest("[data-hero]");
   if (!b) return;
-  if (playMode === "online") openLobby(HEROES[+b.dataset.hero]);
+  if (playMode === "online" || playMode === "coop") { openLobby(HEROES[+b.dataset.hero]); NET.coopLobby = playMode === "coop"; }
   else if (playMode === "run") pickHero(b, h => { if (!runState()) newRun(h); showRunMap(); });
   else if (playMode === "story") pickHero(b, h => {
     if (storyState()) { showStoryMap(); return; }
@@ -5611,7 +5790,7 @@ $("sndBtn").addEventListener("click", () => SND.toggle());
 $("cancelBtn").addEventListener("click", () => { resetMode(); render(); });
 $("menuBtn").addEventListener("click", showSelect);
 $("againBtn").addEventListener("click", () => {
-  if (online && game && game.over && !NET.foeLeft) { requestRematch(); return; }
+  if (online && game && game.over && !NET.foeLeft && !NET.coopDone) { requestRematch(); return; }
   const next = goNext; goNext = null; $("gameover").hidden = true; (next || showSelect)();
 });
 $("shareBtn").addEventListener("click", () => {

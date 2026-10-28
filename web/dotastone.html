@@ -505,6 +505,56 @@ svg.map { filter: saturate(.6) brightness(.7); }
   .mull-card .card { width: 96px; }
 }
 
+/* ---------- Deck builder, run map, reward ---------- */
+.deck-ed { max-width: 1060px; }
+.deck-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.deck-count { font-family: var(--display); font-size: 28px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.deck-count.full { color: var(--ready); }
+.deck-use { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink); cursor: pointer; }
+.deck-use input { width: 18px; height: 18px; accent-color: #f2c23e; }
+.deck-filter { display: flex; flex-wrap: wrap; gap: 6px; }
+.deck-filter button { border: 0; border-radius: 999px; padding: 6px 14px; cursor: pointer; font-weight: 600; background: #1d160d; color: var(--muted); box-shadow: inset 0 0 0 1px var(--gold-lo); }
+.deck-filter button.on { background: linear-gradient(180deg, #f2c23e, #a8720f); color: #2a1a03; }
+.deck-body { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 16px; min-height: 0; }
+.deck-pool { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 16px 12px; max-height: 52vh; overflow-y: auto; overflow-x: hidden; padding: 14px 14px 10px; }
+.pool-card { position: relative; min-width: 0; border: 0; background: none; padding: 0; cursor: pointer; transition: transform .12s; }
+.pool-card .card { width: 100%; cursor: pointer; }
+.pool-card:hover { transform: translateY(-4px); }
+.pool-card.full .card { filter: grayscale(.7) brightness(.6); }
+.pool-n { position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%); z-index: 5; font-size: 12px; font-weight: 800; color: #2a1a03; background: linear-gradient(180deg, #f2c23e, #a8720f); padding: 1px 9px; border-radius: 999px; }
+.deck-list { display: flex; flex-direction: column; gap: 4px; max-height: 52vh; overflow-y: auto; padding: 6px; border-radius: 12px; background: rgba(0, 0, 0, .3); box-shadow: inset 0 0 0 1px rgba(201, 162, 90, .25); }
+.deck-row { display: flex; align-items: center; gap: 8px; border: 0; width: 100%; text-align: left; padding: 5px 8px; border-radius: 8px; cursor: pointer; color: #fff6dc;
+  background: linear-gradient(90deg, var(--c), color-mix(in srgb, var(--c) 30%, #120c06)); font-size: 14px; }
+.deck-row:hover { filter: brightness(1.15); }
+.dr-cost { display: grid; place-items: center; width: 22px; height: 22px; flex: none; border-radius: 4px; transform: rotate(45deg); background: #2f76e6; font-weight: 800; font-size: 12px; }
+.dr-cost { transform: none; border-radius: 50%; }
+.dr-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--display); }
+.dr-n { font-weight: 800; color: var(--gold-hi); }
+.deck-empty { color: var(--muted); font-size: 14px; padding: 8px; margin: 0; }
+.deck-btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; align-items: center; }
+.run-map { max-width: 900px; }
+.run-info { margin: -6px 0 0; color: var(--muted); }
+.run-info b { color: var(--gold-hi); }
+.run-path { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 6px 2px 10px; }
+.run-node { flex: 1 1 0; min-width: 120px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 14px 10px; border-radius: 14px; background: rgba(0, 0, 0, .35); box-shadow: inset 0 0 0 1px rgba(201, 162, 90, .25); opacity: .55; }
+.run-node b { font-family: var(--display); font-weight: 400; color: var(--gold-hi); font-size: 16px; }
+.run-node small { color: var(--muted); font-size: 12px; line-height: 1.35; }
+.rn-n { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; font-family: var(--display); font-size: 20px; color: #2a1a03; background: radial-gradient(circle at 40% 30%, #fff2b0, #b8893a 70%); }
+.run-node.done { opacity: .8; }
+.run-node.done .rn-n { background: radial-gradient(circle at 40% 30%, #c8ffb8, #2c8a3c 70%); color: #fff; }
+.run-node.cur { opacity: 1; box-shadow: inset 0 0 0 2px var(--gold), 0 0 24px rgba(242, 194, 62, .35); }
+.run-node.boss .rn-n { background: radial-gradient(circle at 40% 30%, #ffb09a, #a8200a 70%); color: #fff; }
+.run-link { flex: 0 0 18px; align-self: center; height: 2px; background: linear-gradient(90deg, var(--gold-lo), var(--gold)); }
+.run-deck { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px; max-height: 30vh; overflow-y: auto; }
+.run-deck .deck-row { cursor: default; }
+@media (max-width: 760px) {
+  .deck-body { grid-template-columns: 1fr; }
+  .deck-pool { max-height: 38vh; }
+  .deck-list { max-height: 24vh; }
+  .run-path { flex-direction: column; }
+  .run-link { width: 2px; height: 14px; flex-basis: 14px; }
+}
+
 /* ---------- Sound button and power cooldown ---------- */
 .snd-btn { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 70; width: 42px; height: 42px; border: 0; border-radius: 50%; cursor: pointer; display: grid; place-items: center; color: var(--gold-hi); background: radial-gradient(circle at 40% 30%, #4a3a22, #15100a); box-shadow: 0 0 0 2px var(--gold-lo), 0 6px 14px rgba(0, 0, 0, .6); }
 .snd-btn:hover { box-shadow: 0 0 0 2px var(--gold), 0 0 16px rgba(233, 196, 106, .4); }
@@ -584,11 +634,14 @@ svg.map { filter: saturate(.6) brightness(.7); }
       <div class="diff" id="modeSel" role="group" aria-label="Режим">
         <button class="on" data-mode="bot">Против бота</button>
         <button data-mode="online">С другом онлайн</button>
+        <button data-mode="run">Забег</button>
+        <button data-mode="daily">Испытание дня</button>
       </div>
       <div class="diff" id="diff" role="group" aria-label="Сложность">
         <button class="on" data-diff="easy">Лёгкий бот</button>
         <button data-diff="normal">Обычный бот</button>
       </div>
+      <button class="btn" id="deckBtn">Моя колода</button>
       <button class="btn" id="howBtn">Как играть</button>
     </div>
     <p class="diff-note" id="diffNote"></p>
@@ -645,6 +698,53 @@ svg.map { filter: saturate(.6) brightness(.7); }
   <h2 id="goTitle"></h2>
   <div class="go-sub" id="goSub"></div>
   <button class="big-btn" id="againBtn">Играть снова</button>
+  <button class="btn" id="shareBtn" hidden>Скопировать результат</button>
+</div>
+
+<div class="overlay" id="deckEd" hidden>
+  <div class="tut deck-ed" role="dialog" aria-labelledby="deckTitle">
+    <div class="deck-head">
+      <h2 id="deckTitle">Моя колода</h2>
+      <span class="deck-count" id="deckCount">0/30</span>
+    </div>
+    <label class="deck-use"><input type="checkbox" id="useDeck"> Играть этой колодой против бота и с другом (нужно хотя бы 20 карт)</label>
+    <div class="deck-filter" id="deckFilter" role="group" aria-label="Фильтр по мане">
+      <button data-f="all" class="on">Все</button><button data-f="1">1</button><button data-f="2">2</button><button data-f="3">3</button>
+      <button data-f="4">4</button><button data-f="5">5</button><button data-f="6">6+</button>
+    </div>
+    <div class="deck-body">
+      <div class="deck-pool" id="deckPool"></div>
+      <div class="deck-list" id="deckList"></div>
+    </div>
+    <div class="deck-btns">
+      <button class="btn" id="deckClear">Очистить</button>
+      <button class="btn" id="deckFill">Добить случайными</button>
+      <button class="big-btn" id="deckDone">Готово</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="runMap" hidden>
+  <div class="tut run-map" role="dialog" aria-labelledby="runTitle">
+    <h2 id="runTitle">Забег</h2>
+    <p class="run-info" id="runInfo"></p>
+    <div class="run-path" id="runPath"></div>
+    <div class="deck-btns">
+      <button class="btn" id="runQuit">Сдаться</button>
+      <button class="btn" id="runDeckBtn">Колода забега</button>
+      <button class="big-btn" id="runGo">В бой</button>
+    </div>
+    <div class="run-deck" id="runDeck" hidden></div>
+  </div>
+</div>
+
+<div class="overlay" id="reward" hidden>
+  <div class="tut mull" role="dialog" aria-labelledby="rewardTitle">
+    <h2 id="rewardTitle">Награда за победу</h2>
+    <p class="mull-note">Выберите одну карту: она добавится в колоду забега.</p>
+    <div class="mull-cards" id="rewardCards"></div>
+    <button class="btn" id="rewardSkip">Пропустить</button>
+  </div>
 </div>
 
 <div class="overlay" id="mulligan" hidden>
@@ -854,7 +954,9 @@ class Game {
     this.opts = opts;
     this.human = this.makePlayer("Вы", humanHero, false, opts.humanDeck, opts.humanList);
     this.ai = this.makePlayer(opts.foeName || "Противник", aiHero, true, opts.aiDeck, opts.aiList);
+    if (opts.heroHp) for (const p of [this.human, this.ai]) p.hero.health = p.hero.maxHealth = opts.heroHp;
     if (opts.aiHp) this.ai.hero.health = this.ai.hero.maxHealth = opts.aiHp;
+    if (opts.humanHp) this.human.hero.health = Math.min(this.human.hero.maxHealth, opts.humanHp);
     this.human.opp = this.ai;
     this.ai.opp = this.human;
     this.current = null;
@@ -888,6 +990,9 @@ class Game {
     const first = (hf === undefined ? Math.random() < 0.5 : hf) ? this.human : this.ai;
     const second = first.opp;
     this.first = first;
+    // Режимы: стартовая мана для обоих и дополнительная для соперника
+    if (this.opts.startMana) { this.human.maxMana += this.opts.startMana; this.ai.maxMana += this.opts.startMana; }
+    if (this.opts.aiStartMana) this.ai.maxMana += this.opts.aiStartMana;
     this.say(first === this.human ? "Вы ходите первым." : this.ai.name + " ходит первым.");
     this.draw(first, 3);
     this.draw(second, 4);
@@ -930,7 +1035,7 @@ class Game {
   }
 
   riverEvents() {
-    if (!this.rune && this.turnNo % RUNE_EVERY === 0) {
+    if (!this.rune && this.turnNo % (this.opts.runeEvery || RUNE_EVERY) === 0) {
       this.rune = RUNE_ORDER[this.runeCount++ % RUNE_ORDER.length];
       this.say("На реке появилась " + RUNES[this.rune].name.toLowerCase());
       this.emit({ effect: "rune_spawn", rune: this.rune });
@@ -1246,6 +1351,7 @@ class Game {
     const m = { uid: uidSeq++, isHero: false, def, owner: p, attack: def.attack, health: def.health, maxHealth: def.health,
       taunt: def.taunt, charge: def.charge, shield: def.shield, poison: def.poison, lifesteal: def.lifesteal, stealth: def.stealth,
       sleeping: true, attacksDone: 0, stun: 0, stunned: false };
+    if (this.opts.chargeAll) m.charge = true; // правило дня «Без сна»
     if (idx < 0 || idx > p.board.length) p.board.push(m); else p.board.splice(idx, 0, m);
     return m;
   }
@@ -1614,10 +1720,11 @@ function showSelect() {
   if (MID.ok) MID.attach($("selBg"), "menu");
   menuAmbience();
   SND.playMusic("menu");
+  updateModeNote();
 }
 
 // Выбор героя: вспышка, волна по фону, остальные гаснут, переход в игру
-async function pickHero(btn) {
+async function pickHero(btn, after) {
   if (picking) return;
   picking = true;
   const h = HEROES[+btn.dataset.hero];
@@ -1635,18 +1742,21 @@ async function pickHero(btn) {
   $("select").classList.add("leaving");
   await wait(600);
   clearInterval(menuTimer);
-  startGame(h);
+  if (after) after(h); else startGame(h);
 }
 
 function startGame(hero) {
   const others = HEROES.filter(h => h !== hero);
   const aiHero = others[Math.floor(Math.random() * others.length)];
+  startMatch({ mode: "bot", hero, aiHero, easy, opts: { aiHp: easy ? 20 : undefined, humanList: myDeckActive() || undefined } });
+}
+
+// Общий запуск партии против бота: обычной, забега и испытания дня
+function startMatch(st) {
+  matchMode = st.mode;
   $("logList").innerHTML = "";
-  game = new Game(hero, aiHero, addLog, { mulligan: true });
-  if (easy) {
-    game.ai.easy = true;
-    game.ai.hero.health = game.ai.hero.maxHealth = 20;
-  }
+  game = new Game(st.hero, st.aiHero, addLog, Object.assign({ mulligan: true }, st.opts || {}));
+  if (st.easy) game.ai.easy = true;
   game.onPlay = (p, c) => { if (p === game.ai) { showReveal(c); revealPending = true; } };
   prevHp = new Map();
   seenMinions = new Set();
@@ -1667,8 +1777,9 @@ function startGame(hero) {
     game.begin();
     game.fxQueue.length = 0;
     render();
+    if (st.banner) showBanner(st.banner);
     if (game.current === game.ai) aiTurn();
-    else showBanner("Ваш ход");
+    else if (!st.banner) showBanner("Ваш ход");
   });
 }
 
@@ -2222,6 +2333,19 @@ function showGameOver() {
   else if (lost) { t.textContent = "Поражение"; t.className = "lose"; sub.textContent = game.ai.hero.def.name + " оказался сильнее"; }
   else { t.textContent = "Ничья"; t.className = ""; sub.textContent = "Оба героя пали"; }
   over.classList.toggle("lost", !won);
+  goNext = null;
+  $("againBtn").textContent = "Играть снова";
+  $("shareBtn").hidden = true;
+  if (matchMode === "run" && !online) {
+    const res = runAfterMatch(won);
+    sub.textContent = res.sub;
+    goNext = res.next;
+    $("againBtn").textContent = res.btn;
+  } else if (matchMode === "daily" && !online) {
+    sub.textContent = dailyRecord(won);
+    $("shareBtn").hidden = false;
+    $("shareBtn").textContent = "Скопировать результат";
+  }
   SND.stopMusic();
   SND.play(won ? "win" : "lose");
   over.hidden = false;
@@ -2361,7 +2485,8 @@ function onNetData(msg) {
     // Друг пришёл со своим героем: хозяин раздаёт зерно и решает, кто ходит первым
     NET.started = true;
     NET.client.publish(topicBase(NET.code) + "/lobby", "", { qos: 1, retain: true }); // игра больше не ищется по коду
-    const g = { seed: Math.floor(Math.random() * 2 ** 31), hostHero: NET.hero.id, guestHero: String(msg.hero), hostFirst: Math.random() < .5, guest: msg.from };
+    const g = { seed: Math.floor(Math.random() * 2 ** 31), hostHero: NET.hero.id, guestHero: String(msg.hero), hostFirst: Math.random() < .5, guest: msg.from,
+      hostDeck: myDeckActive(), guestDeck: cleanDeck(msg.deck) };
     netSend({ t: "start", g });
     startOnline("host", g);
     return;
@@ -2435,6 +2560,8 @@ function startOnline(side, g) {
   const deckHost = seededRng(g.seed + 1), deckGuest = seededRng(g.seed + 2);
   game = new Game(iAmHost ? hostHero : guestHero, iAmHost ? guestHero : hostHero, addLog, {
     humanDeck: iAmHost ? deckHost : deckGuest,
+    humanList: cleanDeck(iAmHost ? g.hostDeck : g.guestDeck) || undefined,
+    aiList: cleanDeck(iAmHost ? g.guestDeck : g.hostDeck) || undefined,
     aiDeck: iAmHost ? deckGuest : deckHost,
     humanFirst: iAmHost === !!g.hostFirst,
     foeName: "Друг",
@@ -2538,8 +2665,199 @@ async function joinGame() {
   lobbyBusy = false;
   if (!NET.lobbySeen) { netLeave(); return lobbyMsg("Игры с таким кодом нет. Проверьте код: у друга должно быть открыто окно с кодом."); }
   lobbyMsg("Нашли игру, начинаем…");
-  netSend({ t: "hello", hero: NET.hero.id });
+  netSend({ t: "hello", hero: NET.hero.id, deck: myDeckActive() });
   setTimeout(() => { if (!NET.started && NET.side === "guest") lobbyMsg("Хозяин не отвечает. Попробуйте ещё раз."); }, 8000);
+}
+
+// ======================= Режимы: своя колода, забег, испытание дня =======================
+// Всё хранится в браузере игрока (localStorage): колода, незаконченный забег, рекорды
+const STORE = {
+  get(k, d) { try { const v = localStorage.getItem("dotastone-" + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("dotastone-" + k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem("dotastone-" + k); } catch (e) {} },
+};
+const POOL_IDS = Object.values(CARDS).filter(c => !c.isToken).map(c => c.id);
+let matchMode = "bot", goNext = null, dailyShare = "";
+
+// Колода из списка id: только настоящие карты, не больше 2 копий и 30 штук
+function cleanDeck(list) {
+  if (!Array.isArray(list)) return null;
+  const n = {}, out = [];
+  for (const id of list) {
+    const c = CARDS[id];
+    if (!c || c.isToken || (n[id] || 0) >= 2 || out.length >= DECK_SIZE) continue;
+    n[id] = (n[id] || 0) + 1;
+    out.push(id);
+  }
+  return out.length >= 20 ? out : null;
+}
+function myDeck() { const d = STORE.get("deck", []); return Array.isArray(d) ? d.filter(id => CARDS[id] && !CARDS[id].isToken) : []; }
+function myDeckActive() { return STORE.get("usedeck", false) ? cleanDeck(myDeck()) : null; }
+
+// ---- Конструктор колоды ----
+let deckFilter = "all";
+function openDeckEditor() { renderDeckEditor(); $("deckEd").hidden = false; }
+function deckCounts(deck) { const n = {}; for (const id of deck) n[id] = (n[id] || 0) + 1; return n; }
+function renderDeckEditor() {
+  const deck = myDeck(), n = deckCounts(deck);
+  $("deckCount").textContent = deck.length + "/" + DECK_SIZE;
+  $("deckCount").classList.toggle("full", deck.length === DECK_SIZE);
+  $("useDeck").checked = !!STORE.get("usedeck", false);
+  const byCost = (a, b) => a.cost - b.cost || a.name.localeCompare(b.name, "ru");
+  const pool = POOL_IDS.map(id => CARDS[id]).filter(c => deckFilter === "all" || (deckFilter === "6" ? c.cost >= 6 : c.cost === +deckFilter)).sort(byCost);
+  $("deckPool").innerHTML = pool.map(c => `<button class="pool-card${(n[c.id] || 0) >= 2 ? " full" : ""}" data-add="${c.id}" aria-label="Добавить «${esc(c.name)}», сейчас ${n[c.id] || 0} из 2">
+      ${cardHTML(c, "", "")}<span class="pool-n">${n[c.id] || 0}/2</span></button>`).join("");
+  const rows = Object.keys(n).map(id => CARDS[id]).sort(byCost);
+  $("deckList").innerHTML = rows.length ? rows.map(c => `<button class="deck-row c-${c.attr}" data-rem="${c.id}" aria-label="Убрать «${esc(c.name)}»">
+      <span class="dr-cost">${c.cost}</span><span class="dr-name">${esc(c.name)}</span><span class="dr-n">×${n[c.id]}</span></button>`).join("")
+    : '<p class="deck-empty">Колода пуста. Нажимайте на карты слева, чтобы добавить.</p>';
+  for (const b of $("deckFilter").children) b.classList.toggle("on", b.dataset.f === deckFilter);
+}
+function deckAdd(id) {
+  const deck = myDeck(), n = deckCounts(deck);
+  if (deck.length >= DECK_SIZE || (n[id] || 0) >= 2) { SND.play("ui"); return; }
+  deck.push(id);
+  STORE.set("deck", deck);
+  SND.play("card");
+  renderDeckEditor();
+}
+function deckRemove(id) {
+  const deck = myDeck(), i = deck.lastIndexOf(id);
+  if (i >= 0) deck.splice(i, 1);
+  STORE.set("deck", deck);
+  SND.play("ui");
+  renderDeckEditor();
+}
+function deckFillRandom() {
+  const deck = myDeck(), n = deckCounts(deck);
+  const pool = POOL_IDS.flatMap(id => [id, id]).filter(id => { if ((n[id] || 0) >= 2) return false; n[id] = (n[id] || 0) + 1; return true; });
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  while (deck.length < DECK_SIZE && pool.length) deck.push(pool.pop());
+  STORE.set("deck", deck);
+  renderDeckEditor();
+}
+
+// ---- Забег: 5 этажей, в конце босс Рошан ----
+const RUN_START = ["melee_creep", "melee_creep", "ranged_creep", "ranged_creep", "courier", "courier", "centaur", "centaur", "ogre", "ogre",
+  "riki", "phantom", "abaddon", "sniper", "dazzle", "venomancer", "tango", "tango", "dagon", "dagon", "mom", "mkb", "tome", "jugg"];
+const RUN_FLOORS = [
+  { name: "Лесные крипы", text: "Лёгкий бот, 20 здоровья", easy: true, aiHp: 20 },
+  { name: "Соперник на миде", text: "Обычный бот, 25 здоровья", aiHp: 25 },
+  { name: "Ганк с двух линий", text: "Обычный бот, 30 здоровья", aiHp: 30 },
+  { name: "Древние крипы", text: "Обычный бот, 35 здоровья и +1 мана на старте", aiHp: 35, aiStartMana: 1 },
+  { name: "Логово Рошана", text: "Босс: 50 здоровья, своя колода и ультимейт", aiHp: 50, boss: true },
+];
+const BOSS_HERO = { id: "roshanboss", name: "Рошан", color: "#5a2a10", power: "Сокрушение", powerText: "Нанесите 2 урона всем вражеским существам.",
+  effect: "damageEnemyMinions", value: 2, target: null, cooldown: 2, tag: "Босс", glow: "#ff6a1a", orbs: ["#ff6a1a", "#ffb02e", "#b33a10"],
+  ult: { name: "Землетрясение", text: "Нанесите 5 урона всем врагам.", effect: "damageAllEnemies", value: 5, target: null, cost: 7 } };
+const BOSS_DECK = ["tide", "tide", "axe", "axe", "pudge_t", "lifestealer", "lifestealer", "centaur", "centaur", "abaddon", "abaddon", "jugg", "jugg",
+  "brood", "brood", "warlock", "sven", "venomancer", "venomancer", "stormhammer", "stormhammer", "wrath", "freezing", "freezing", "dagon", "dagon",
+  "heart", "drum", "battlefury", "rapier"].filter(id => CARDS[id]);
+if (ART.roshan) ART["hero_roshanboss"] = ART.roshan;
+
+const runState = () => STORE.get("run", null);
+function newRun(hero) {
+  const r = { hero: hero.id, deck: RUN_START.slice(), floor: 0, hp: START_HP };
+  STORE.set("run", r);
+  return r;
+}
+
+function showRunMap() {
+  const r = runState();
+  if (!r) { showSelect(); return; }
+  if (!$("select").hidden || game) showSelect();
+  const hero = HEROES.find(h => h.id === r.hero) || HEROES[0];
+  $("runInfo").innerHTML = `Герой: <b>${esc(hero.name)}</b> · Здоровье: <b>${r.hp}/${START_HP}</b> · Карт в колоде: <b>${r.deck.length}</b>`;
+  $("runPath").innerHTML = RUN_FLOORS.map((f, i) => `<div class="run-node ${i < r.floor ? "done" : i === r.floor ? "cur" : ""}${f.boss ? " boss" : ""}">
+      <span class="rn-n">${i < r.floor ? "✓" : i + 1}</span><b>${esc(f.name)}</b><small>${esc(f.text)}</small></div>`).join('<div class="run-link"></div>');
+  $("runDeck").hidden = true;
+  $("runMap").hidden = false;
+}
+
+function runFight() {
+  const r = runState();
+  if (!r) return;
+  const f = RUN_FLOORS[r.floor], hero = HEROES.find(h => h.id === r.hero) || HEROES[0];
+  const others = HEROES.filter(h => h !== hero);
+  const aiHero = f.boss ? BOSS_HERO : others[Math.floor(Math.random() * others.length)];
+  $("runMap").hidden = true;
+  startMatch({ mode: "run", hero, aiHero, easy: !!f.easy, banner: `Этаж ${r.floor + 1}: ${f.name}`,
+    opts: { humanList: r.deck, humanHp: r.hp, aiHp: f.aiHp, aiStartMana: f.aiStartMana || 0, aiList: f.boss ? BOSS_DECK : undefined } });
+}
+
+// Итог боя в забеге: подпись, следующий шаг и текст кнопки
+function runAfterMatch(won) {
+  const r = runState();
+  if (!r) return { sub: "", next: showSelect, btn: "В меню" };
+  if (!won) {
+    STORE.del("run");
+    return { sub: `Забег окончен на этаже ${r.floor + 1} из ${RUN_FLOORS.length}. Попробуйте ещё раз!`, next: showSelect, btn: "В меню" };
+  }
+  r.hp = Math.min(START_HP, Math.max(1, game.human.hero.health) + 8);
+  r.floor++;
+  if (r.floor >= RUN_FLOORS.length) {
+    STORE.del("run");
+    const wins = STORE.get("runwins", 0) + 1;
+    STORE.set("runwins", wins);
+    return { sub: `Забег пройден, Рошан повержен! Всего пройдено забегов: ${wins}.`, next: showSelect, btn: "В меню" };
+  }
+  STORE.set("run", r);
+  return { sub: `Этаж ${r.floor} пройден. Здоровье после отдыха: ${r.hp}.`, next: showReward, btn: "Забрать награду" };
+}
+
+// Награда: 3 случайные карты, на верхних этажах чаще дорогие
+function showReward() {
+  const r = runState();
+  if (!r) { showSelect(); return; }
+  const pool = POOL_IDS.filter(id => id !== "coin");
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  const strong = pool.filter(id => CARDS[id].cost >= 4), picks = [];
+  if (r.floor >= 2 && strong.length) picks.push(strong[0]);
+  for (const id of pool) { if (picks.length >= 3) break; if (!picks.includes(id)) picks.push(id); }
+  $("rewardCards").innerHTML = picks.map(id => `<button class="mull-card" data-pick="${id}" aria-label="Взять «${esc(CARDS[id].name)}»">${cardHTML(CARDS[id], "", "")}</button>`).join("");
+  $("reward").hidden = false;
+}
+function takeReward(id) {
+  const r = runState();
+  if (r && id) { r.deck.push(id); STORE.set("run", r); SND.play("coin"); }
+  $("reward").hidden = true;
+  showRunMap();
+}
+
+// ---- Испытание дня: одинаковые для всех герои, колоды, первый ход и правило ----
+const DAILY_MODS = [
+  { name: "Быстрый старт", text: "Оба начинают с 3 кристаллами маны.", opts: { startMana: 2 } },
+  { name: "Толстокожие", text: "У героев по 45 здоровья.", opts: { heroHp: 45 } },
+  { name: "Рунный день", text: "Руны появляются каждые 2 хода.", opts: { runeEvery: 2 } },
+  { name: "Без сна", text: "Все существа атакуют сразу, как с рывком.", opts: { chargeAll: true } },
+];
+function dailyInfo() {
+  const d = new Date(), key = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  const rng = seededRng(Math.imul(key, 2654435761) >>> 0);
+  const hi = Math.floor(rng() * HEROES.length);
+  let ai = Math.floor(rng() * (HEROES.length - 1));
+  if (ai >= hi) ai++;
+  const mod = DAILY_MODS[Math.floor(rng() * DAILY_MODS.length)];
+  return { key, date: d.toLocaleDateString("ru-RU"), hero: HEROES[hi], aiHero: HEROES[ai], mod, first: rng() < .5,
+    seedA: Math.floor(rng() * 2 ** 31), seedB: Math.floor(rng() * 2 ** 31) };
+}
+function startDaily() {
+  const d = dailyInfo();
+  startMatch({ mode: "daily", hero: d.hero, aiHero: d.aiHero, banner: "Испытание дня: " + d.mod.name,
+    opts: Object.assign({ humanDeck: seededRng(d.seedA), aiDeck: seededRng(d.seedB), humanFirst: d.first }, d.mod.opts) });
+}
+const turnsWord = n => n + " " + (n % 10 === 1 && n % 100 !== 11 ? "ход" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "хода" : "ходов");
+function dailyRecord(won) {
+  const d = dailyInfo();
+  let rec = STORE.get("daily", {});
+  if (rec.key !== d.key) rec = { key: d.key, best: null, plays: 0 };
+  rec.plays++;
+  const turns = Math.ceil(game.turnNo / 2);
+  if (won && (rec.best == null || turns < rec.best)) rec.best = turns;
+  STORE.set("daily", rec);
+  dailyShare = `DotaStone · испытание ${d.date} («${d.mod.name}», ${d.hero.name} против ${d.aiHero.name}): `
+    + (won ? `победа за ${turnsWord(turns)}.` : "поражение.") + (rec.best ? ` Рекорд: ${turnsWord(rec.best)}.` : "") + " https://blago-ceo.github.io/dotastone/";
+  return (won ? `Победа за ${turnsWord(turns)}.` : "Не вышло, попробуйте ещё.") + (rec.best ? ` Рекорд дня: ${turnsWord(rec.best)}.` : "") + ` Попыток сегодня: ${rec.plays}.`;
 }
 
 // ---------- Предпросмотр ----------
@@ -4446,11 +4764,46 @@ $("modeSel").addEventListener("click", e => {
   if (!b) return;
   playMode = b.dataset.mode;
   for (const x of $("modeSel").children) x.classList.toggle("on", x === b);
-  $("diff").hidden = playMode === "online";
-  $("diffNote").textContent = playMode === "online"
-    ? "Выберите героя, потом создайте игру и скажите другу код. Друг открывает эту же страницу и входит по коду."
-    : (easy ? DIFF_NOTES.easy : DIFF_NOTES.normal);
+  updateModeNote();
 });
+
+function updateModeNote() {
+  $("diff").hidden = playMode !== "bot";
+  let t;
+  if (playMode === "online") t = "Выберите героя, потом создайте игру и скажите другу код. Друг открывает эту же страницу и входит по коду.";
+  else if (playMode === "run") {
+    const r = runState();
+    const h = r && HEROES.find(x => x.id === r.hero);
+    t = r && h ? `Незаконченный забег: ${h.name}, этаж ${r.floor + 1} из ${RUN_FLOORS.length}, здоровье ${r.hp}. Нажмите на любого героя, чтобы продолжить.`
+      : "Пять боёв подряд, в конце босс Рошан. Здоровье переносится между боями, за каждую победу новая карта в колоду. Выберите героя.";
+  } else if (playMode === "daily") {
+    const d = dailyInfo(), rec = STORE.get("daily", {});
+    const best = rec.key === d.key && rec.best ? ` Ваш рекорд: победа за ${turnsWord(rec.best)}.` : "";
+    t = `Испытание ${d.date}: ${d.hero.name} против ${d.aiHero.name}. Правило дня «${d.mod.name}»: ${d.mod.text} Колоды у всех одинаковые.${best} Нажмите на любого героя, чтобы начать.`;
+  } else t = (easy ? DIFF_NOTES.easy : DIFF_NOTES.normal) + (myDeckActive() ? " Вы играете своей колодой." : "");
+  $("diffNote").textContent = t;
+}
+$("deckBtn").addEventListener("click", openDeckEditor);
+$("deckDone").addEventListener("click", () => { $("deckEd").hidden = true; updateModeNote(); });
+$("deckClear").addEventListener("click", () => { STORE.set("deck", []); renderDeckEditor(); });
+$("deckFill").addEventListener("click", deckFillRandom);
+$("useDeck").addEventListener("change", e => { STORE.set("usedeck", e.target.checked); updateModeNote(); });
+$("deckFilter").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (b) { deckFilter = b.dataset.f; renderDeckEditor(); } });
+$("deckPool").addEventListener("click", e => { const b = e.target.closest("[data-add]"); if (b) deckAdd(b.dataset.add); });
+$("deckPool").addEventListener("mouseover", e => { const b = e.target.closest("[data-add]"); if (b) showPreview(b.dataset.add); });
+$("deckList").addEventListener("click", e => { const b = e.target.closest("[data-rem]"); if (b) deckRemove(b.dataset.rem); });
+$("runGo").addEventListener("click", runFight);
+$("runQuit").addEventListener("click", () => { STORE.del("run"); $("runMap").hidden = true; updateModeNote(); });
+$("runDeckBtn").addEventListener("click", () => {
+  const r = runState(), box = $("runDeck");
+  if (!r) return;
+  const n = deckCounts(r.deck);
+  box.innerHTML = Object.keys(n).map(id => CARDS[id]).filter(Boolean).sort((a, b) => a.cost - b.cost)
+    .map(c => `<span class="deck-row c-${c.attr}"><span class="dr-cost">${c.cost}</span><span class="dr-name">${esc(c.name)}</span><span class="dr-n">×${n[c.id]}</span></span>`).join("");
+  box.hidden = !box.hidden;
+});
+$("rewardCards").addEventListener("click", e => { const b = e.target.closest("[data-pick]"); if (b) takeReward(b.dataset.pick); });
+$("rewardSkip").addEventListener("click", () => takeReward(null));
 $("createBtn").addEventListener("click", () => createGame());
 $("joinBtn").addEventListener("click", joinGame);
 $("codeInput").addEventListener("keydown", e => { if (e.key === "Enter") joinGame(); });
@@ -4458,7 +4811,7 @@ $("lobbyClose").addEventListener("click", closeLobby);
 
 $("diff").addEventListener("click", e => {
   const b = e.target.closest("[data-diff]");
-  if (b) setDifficulty(b.dataset.diff === "easy");
+  if (b) { setDifficulty(b.dataset.diff === "easy"); updateModeNote(); }
 });
 setDifficulty(true);
 FX.init();
@@ -4478,6 +4831,8 @@ $("heroList").addEventListener("click", e => {
   const b = e.target.closest("[data-hero]");
   if (!b) return;
   if (playMode === "online") openLobby(HEROES[+b.dataset.hero]);
+  else if (playMode === "run") pickHero(b, h => { if (!runState()) newRun(h); showRunMap(); });
+  else if (playMode === "daily") pickHero(b, () => startDaily());
   else pickHero(b);
 });
 
@@ -4547,7 +4902,12 @@ document.addEventListener("pointerdown", () => SND.unlock(), true);
 document.addEventListener("keydown", () => SND.unlock(), true);
 $("sndBtn").addEventListener("click", () => SND.toggle());
 $("cancelBtn").addEventListener("click", () => { resetMode(); render(); });
-$("againBtn").addEventListener("click", showSelect);
+$("againBtn").addEventListener("click", () => { const next = goNext; goNext = null; $("gameover").hidden = true; (next || showSelect)(); });
+$("shareBtn").addEventListener("click", () => {
+  const done = () => { $("shareBtn").textContent = "Скопировано"; };
+  try { navigator.clipboard.writeText(dailyShare).then(done, () => { $("goSub").textContent = dailyShare; }); }
+  catch (e) { $("goSub").textContent = dailyShare; }
+});
 $("logToggle").addEventListener("click", () => $("rail").classList.toggle("open"));
 window.addEventListener("resize", () => { if (game) fitHand(); });
 

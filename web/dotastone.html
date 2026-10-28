@@ -505,6 +505,34 @@ svg.map { filter: saturate(.6) brightness(.7); }
   .mull-card .card { width: 96px; }
 }
 
+/* ---------- Emotes, rope ---------- */
+.emote-btn { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border-radius: 50%; color: var(--gold-hi); }
+.emote-btn svg { width: 20px; height: 20px; }
+.emote-menu { position: absolute; right: 180px; top: calc(100% + 8px); z-index: 30; display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 6px; padding: 10px; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(40, 30, 16, .97), rgba(16, 11, 6, .97)); box-shadow: 0 0 0 1px #0a0704, 0 0 0 2px var(--gold-lo), 0 10px 30px rgba(0, 0, 0, .7); }
+.river:has(#emoteMenu:not([hidden])) { z-index: 20; }
+.emote-menu button { border: 0; padding: 9px 12px; border-radius: 10px; cursor: pointer; font: inherit; font-size: 14px; font-weight: 600; color: var(--ink); text-align: left;
+  background: rgba(255, 255, 255, .05); box-shadow: inset 0 0 0 1px rgba(201, 162, 90, .25); }
+.emote-menu button:hover, .emote-menu button:focus-visible { color: #2a1a03; background: linear-gradient(180deg, #f2c23e, #a8720f); outline: none; }
+.emote-menu .em-mute { grid-column: 1 / -1; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); text-align: center; }
+.emote-bubble { position: fixed; z-index: 60; max-width: 240px; padding: 10px 16px; border-radius: 16px; pointer-events: none; font-family: var(--display); font-size: 18px; line-height: 1.2; text-align: center;
+  color: #2a1a03; background: radial-gradient(ellipse at 50% 20%, #fffbe8, #f3dfa6 70%); box-shadow: 0 0 0 2px #7a5414, 0 0 22px rgba(255, 215, 90, .45), 0 8px 18px rgba(0, 0, 0, .6);
+  transform: translate(-50%, -100%) scale(.6); opacity: 0; animation: emoteIn .28s cubic-bezier(.2, 1.6, .4, 1) forwards; }
+.emote-bubble.foe { transform: translate(-50%, 0) scale(.6); animation-name: emoteInFoe; }
+.emote-bubble::after { content: ""; position: absolute; left: 50%; width: 14px; height: 14px; background: #f3dfa6; box-shadow: 2px 2px 0 0 #7a5414; transform: translateX(-50%) rotate(45deg); bottom: -7px; }
+.emote-bubble.foe::after { bottom: auto; top: -7px; box-shadow: -2px -2px 0 0 #7a5414; }
+.emote-bubble.out { transition: opacity .35s; opacity: 0 !important; }
+@keyframes emoteIn { to { opacity: 1; transform: translate(-50%, -100%) scale(1); } }
+@keyframes emoteInFoe { to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+.rope { position: absolute; left: 14px; right: 14px; top: -4px; height: 8px; z-index: 5; pointer-events: none; display: flex; justify-content: flex-end; }
+.rope-cord { position: relative; height: 100%; border-radius: 4px; transition: width .2s linear;
+  background: repeating-linear-gradient(115deg, #c8a061 0 6px, #8a6430 6px 10px); box-shadow: 0 0 0 1px #2a1a08, 0 2px 6px rgba(0, 0, 0, .6); }
+.rope-cord::before { content: ""; position: absolute; left: -9px; top: 50%; width: 18px; height: 18px; border-radius: 50%; transform: translateY(-50%);
+  background: radial-gradient(circle, #fff6c0, #ffb02e 40%, rgba(255, 90, 20, .5) 65%, transparent 72%); animation: ropeFlame .18s ease-in-out infinite alternate; }
+.rope.foe .rope-cord { filter: hue-rotate(-25deg) saturate(1.3); opacity: .75; }
+@keyframes ropeFlame { to { transform: translateY(-50%) scale(1.35); filter: brightness(1.3); } }
+@media (prefers-reduced-motion: reduce) { .rope-cord::before { animation: none; } .emote-bubble { animation-duration: .01s; } }
+
 /* ---------- Deck builder, run map, reward ---------- */
 .deck-ed { max-width: 1060px; }
 .deck-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
@@ -663,6 +691,9 @@ svg.map { filter: saturate(.6) brightness(.7); }
         <div class="river-mid" id="riverMid"></div>
         <div id="status"></div>
         <button class="btn" id="cancelBtn" hidden>Отмена</button>
+        <button class="btn emote-btn" id="emoteBtn" aria-label="Эмоции" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H10l-5 4v-4H4a1 1 0 0 1-1-1v-10a1 1 0 0 1 1-1z" fill="currentColor"/></svg></button>
+        <div class="emote-menu" id="emoteMenu" role="menu" hidden></div>
+        <div class="rope" id="rope" hidden aria-hidden="true"><div class="rope-cord" id="ropeCord"></div></div>
         <button class="btn" id="helpBtn" aria-label="Как играть">?</button>
         <button class="btn" id="logToggle">Журнал</button>
         <button id="endTurn">Конец<br>хода</button>
@@ -699,6 +730,7 @@ svg.map { filter: saturate(.6) brightness(.7); }
   <div class="go-sub" id="goSub"></div>
   <button class="big-btn" id="againBtn">Играть снова</button>
   <button class="btn" id="shareBtn" hidden>Скопировать результат</button>
+  <button class="btn" id="menuBtn" hidden>В меню</button>
 </div>
 
 <div class="overlay" id="deckEd" hidden>
@@ -2296,6 +2328,7 @@ async function aiTurn() {
   aiBusy = true;
   render();
   showBanner("Ход противника");
+  if (game.human.hero.health <= 10 && Math.random() < .3) setTimeout(() => { if (run === runId) showEmote("foe", pick(BOT_TAUNTS)); }, 500);
   await sleep(1200);
   let actions = 0;
   for (let i = 0; i < 40 && !game.over; i++) {
@@ -2335,7 +2368,11 @@ function showGameOver() {
   over.classList.toggle("lost", !won);
   goNext = null;
   $("againBtn").textContent = "Играть снова";
+  $("againBtn").disabled = false;
   $("shareBtn").hidden = true;
+  $("menuBtn").hidden = true;
+  closeEmotes();
+  $("rope").hidden = true;
   if (matchMode === "run" && !online) {
     const res = runAfterMatch(won);
     sub.textContent = res.sub;
@@ -2345,6 +2382,12 @@ function showGameOver() {
     sub.textContent = dailyRecord(won);
     $("shareBtn").hidden = false;
     $("shareBtn").textContent = "Скопировать результат";
+  } else if (online) {
+    $("menuBtn").hidden = false;
+    if (NET.foeLeft) { sub.textContent = "Друг вышел из игры."; $("againBtn").textContent = "В меню"; }
+    else if (NET.reMe) { $("againBtn").textContent = "Ждём друга…"; $("againBtn").disabled = true; }
+    else if (NET.reFoe) { sub.textContent += ". Друг хочет реванш!"; $("againBtn").textContent = "Принять реванш"; }
+    else $("againBtn").textContent = "Реванш";
   }
   SND.stopMusic();
   SND.play(won ? "win" : "lose");
@@ -2431,7 +2474,7 @@ function netLeave() {
 // он попросит переслать, и партия догонит сама
 function sendMove(m) {
   if (!online) return;
-  const body = Object.assign({ seq: NET.seq++, by: NET.side }, m);
+  const body = Object.assign({ seq: NET.seq++, by: NET.side, gn: NET.gn }, m);
   NET.sent.push(body);
   if (!netSend(body)) setHint("Ход не отправился: связь с другом потеряна, пробуем ещё раз.");
 }
@@ -2440,10 +2483,11 @@ function requestResend() {
   const now = Date.now();
   if (now - (NET.askedAt || 0) < 1500) return;
   NET.askedAt = now;
-  netSend({ t: "resend", from: NET.rseq, by: NET.side });
+  netSend({ t: "resend", from: NET.rseq, by: NET.side, gn: NET.gn });
 }
 
 function acceptMove(msg) {
+  if ((msg.gn || 0) !== NET.gn) return; // ход из прошлой партии (до реванша)
   if (msg.seq < NET.rseq) return; // повтор
   if (msg.seq > NET.rseq) { NET.pending.set(msg.seq, msg); requestResend(); return; } // дыра в нумерации
   NET.rseq = msg.seq + 1;
@@ -2458,8 +2502,9 @@ function acceptMove(msg) {
 
 // Ходы друга применяются строго по очереди, с теми же анимациями, что у бота
 function applyRemote(m) {
+  const gn = NET.gn;
   NET.chain = NET.chain.catch(() => {}).then(async () => {
-    if (!game || game.over || !online) return;
+    if (!game || game.over || !online || gn !== NET.gn) return;
     const foe = game.ai;
     if (m.t === "play") game.playCard(foe, m.i, decTarget(m.tg));
     else if (m.t === "power") game.usePower(foe, decTarget(m.tg));
@@ -2491,15 +2536,39 @@ function onNetData(msg) {
     startOnline("host", g);
     return;
   }
+  if (msg.t === "start" && msg.re && NET.side === "guest" && online && msg.g && msg.g.guest === NET.id && msg.g.gn === NET.gn + 1) {
+    startOnline("guest", msg.g); // реванш
+    return;
+  }
+  if (msg.t === "rematch" && msg.by !== NET.side && online && msg.gn === NET.gn) {
+    NET.reFoe = true;
+    if (game && game.over && !NET.reMe) {
+      $("goSub").textContent = "Друг хочет реванш!";
+      $("againBtn").textContent = "Принять реванш";
+    }
+    maybeRematch();
+    return;
+  }
+  if (msg.t === "emote" && msg.by !== NET.side && online && game && msg.gn === NET.gn) {
+    if (EMOTES.some(x => x.id === msg.e)) showEmote("foe", msg.e);
+    return;
+  }
   if (msg.t === "start" && NET.side === "guest" && !NET.started && msg.g && msg.g.guest === NET.id) {
     NET.started = true;
     startOnline("guest", msg.g);
     return;
   }
-  if (msg.t === "bye" && online && game && !game.over) {
-    setHint("Друг вышел из игры. Вернитесь в меню и начните заново.");
+  if (msg.t === "bye" && online && game) {
+    NET.foeLeft = true;
+    if (!game.over) setHint("Друг вышел из игры. Вернитесь в меню и начните заново.");
+    else {
+      $("goSub").textContent = "Друг вышел из игры.";
+      $("againBtn").disabled = false;
+      $("againBtn").textContent = "В меню";
+    }
     return;
   }
+  if ((msg.t === "resend" || msg.t === "sync") && (msg.gn || 0) !== NET.gn) return;
   if (msg.t === "resend" && msg.by !== NET.side && online) {
     for (const b of NET.sent) if (b.seq >= msg.from) netSend(b);
     return;
@@ -2547,6 +2616,12 @@ function startOnline(side, g) {
   const byId = id => HEROES.find(h => h.id === id) || HEROES[0];
   const hostHero = byId(g.hostHero), guestHero = byId(g.guestHero);
   const iAmHost = side === "host";
+  NET.g = g;
+  NET.gn = g.gn || 0;
+  NET.reMe = NET.reFoe = NET.foeLeft = false;
+  runId++;
+  $("gameover").hidden = true;
+  $("againBtn").disabled = false;
   NET.seq = 0;
   NET.rseq = 0;
   NET.sent = [];
@@ -2554,7 +2629,7 @@ function startOnline(side, g) {
   NET.myMull = NET.foeMull = false;
   // Сверка раз в 4 секунды: сколько ходов я отправил — друг поймёт, если что-то потерял
   clearInterval(NET.syncTimer);
-  NET.syncTimer = setInterval(() => { if (online) netSend({ t: "sync", sent: NET.seq, by: NET.side }); }, 4000);
+  NET.syncTimer = setInterval(() => { if (online) netSend({ t: "sync", sent: NET.seq, by: NET.side, gn: NET.gn }); }, 4000);
   NET.chain = Promise.resolve();
   online = true;
   const deckHost = seededRng(g.seed + 1), deckGuest = seededRng(g.seed + 2);
@@ -2588,6 +2663,23 @@ function startOnline(side, g) {
     if (!NET.foeMull) { $("mullDone").hidden = true; $("mullWait").hidden = false; $("mulligan").hidden = false; }
     tryBeginOnline();
   });
+}
+
+// Реванш: оба нажали кнопку, хозяин раздаёт новое зерно, первым ходит другой игрок
+function requestRematch() {
+  if (NET.reMe) return;
+  NET.reMe = true;
+  netSend({ t: "rematch", by: NET.side, gn: NET.gn });
+  $("againBtn").disabled = true;
+  $("againBtn").textContent = "Ждём друга…";
+  if (!NET.reFoe) $("goSub").textContent = "Предложение реванша отправлено.";
+  maybeRematch();
+}
+function maybeRematch() {
+  if (NET.side !== "host" || !NET.reMe || !NET.reFoe || !NET.g) return;
+  const g = Object.assign({}, NET.g, { seed: Math.floor(Math.random() * 2 ** 31), hostFirst: !NET.g.hostFirst, gn: NET.gn + 1 });
+  netSend({ t: "start", g, re: true });
+  startOnline("host", g);
 }
 
 // Партия начинается, когда оба игрока заменили карты
@@ -2860,6 +2952,109 @@ function dailyRecord(won) {
   return (won ? `Победа за ${turnsWord(turns)}.` : "Не вышло, попробуйте ещё.") + (rec.best ? ` Рекорд дня: ${turnsWord(rec.best)}.` : "") + ` Попыток сегодня: ${rec.plays}.`;
 }
 
+// ======================= Эмоции и фитиль хода =======================
+// Голосовые эмоции: фразы из папки «звуки» (лежат в sfx/), dur — длина в секундах
+const EMOTES = [
+  { id: "gg", text: "ГГ", dur: 2.1 },
+  { id: "lagaet", text: "Лагает", dur: 4.1 },
+  { id: "skipnul", text: "СКИПНУЛ", dur: 5.7 },
+  { id: "stary_bog", text: "Старый бог", dur: 1.1 },
+  { id: "zapyataya", text: "Запятая", dur: .9 },
+  { id: "bez_zapyatoy", text: "Без запятой", dur: 1 },
+  { id: "konchat_net", text: "Кончать нет", dur: 4.5 },
+  { id: "yaytsa", text: "Яйца", dur: 4.7 },
+  { id: "eto_pizdaaa", text: "Это пиздааа", dur: 8 },
+];
+// Что бот отвечает на эмоцию игрока; чего нет в списке — случайная фраза
+const BOT_REPLY = { gg: "gg", zapyataya: "bez_zapyatoy", bez_zapyatoy: "zapyataya", lagaet: "skipnul" };
+const BOT_TAUNTS = ["skipnul", "eto_pizdaaa", "konchat_net", "stary_bog"];
+const emoteOf = id => EMOTES.find(x => x.id === id) || EMOTES[0];
+const VOICE = {};
+function voice(id) {
+  if (!VOICE[id]) { VOICE[id] = new Audio("sfx/" + id + ".mp3"); VOICE[id].preload = "auto"; }
+  return VOICE[id];
+}
+function playVoice(id) {
+  if (!SND.on) return;
+  try { const a = voice(id); a.currentTime = 0; a.volume = .9; const pr = a.play(); if (pr) pr.catch(() => {}); } catch (e) {}
+}
+let emoteMuted = false, emoteAt = 0;
+
+function openEmotes() {
+  if (!game || game.over) return;
+  for (const x of EMOTES) voice(x.id); // подгрузить заранее, чтобы фраза звучала сразу
+  $("emoteMenu").innerHTML = EMOTES.map(x => `<button role="menuitem" data-emote="${x.id}">${esc(x.text)}</button>`).join("")
+    + `<button role="menuitemcheckbox" aria-checked="${emoteMuted}" class="em-mute" data-emote="mute">${emoteMuted ? "Включить соперника" : "Заглушить соперника"}</button>`;
+  $("emoteMenu").hidden = false;
+  $("emoteBtn").setAttribute("aria-expanded", "true");
+  $("emoteMenu").querySelector("button").focus();
+}
+function closeEmotes() {
+  $("emoteMenu").hidden = true;
+  $("emoteBtn").setAttribute("aria-expanded", "false");
+}
+
+function showEmote(side, id) {
+  if (!game || (side === "foe" && emoteMuted)) return;
+  const bar = $(side === "me" ? "playerBar" : "enemyBar"), port = bar && bar.querySelector(".portrait");
+  if (!port) return;
+  const em = emoteOf(id);
+  document.querySelectorAll(".emote-bubble." + side).forEach(b => b.remove());
+  const b = document.createElement("div");
+  b.className = "emote-bubble " + side;
+  b.setAttribute("role", "status");
+  b.textContent = em.text;
+  const r = port.getBoundingClientRect();
+  b.style.left = (r.left + r.width / 2) + "px";
+  b.style.top = (side === "me" ? r.top - 8 : r.bottom + 8) + "px";
+  document.body.appendChild(b);
+  playVoice(id);
+  const ms = Math.max(2400, em.dur * 1000 + 300);
+  setTimeout(() => b.classList.add("out"), ms);
+  setTimeout(() => b.remove(), ms + 400);
+}
+
+function sendEmote(id) {
+  closeEmotes();
+  if (!game || game.over) return;
+  const now = Date.now();
+  if (now < emoteAt) return; // не спамить: следующая фраза после конца предыдущей
+  emoteAt = now + Math.max(1500, emoteOf(id).dur * 1000);
+  showEmote("me", id);
+  if (online) { netSend({ t: "emote", e: id, by: NET.side, gn: NET.gn }); return; }
+  const reply = BOT_REPLY[id] || pick(EMOTES).id, run = runId;
+  if (Math.random() < .5) setTimeout(() => { if (run === runId && game && !game.over) showEmote("foe", reply); }, emoteOf(id).dur * 1000 + 400 + Math.random() * 700);
+}
+
+// Фитиль: на ход 75 секунд, последние 20 горит верёвка, по нулю ход заканчивается сам
+const TURN_TIME = 75, ROPE_TIME = 20;
+const ROPE = { key: "", start: 0, sec: 0 };
+function ropeTick() {
+  const el = $("rope");
+  if (!game || game.over || !game.current || $("game").hidden) { el.hidden = true; ROPE.key = ""; return; }
+  const mine = game.current === game.human;
+  const key = game.turnNo + (mine ? ":me" : ":foe");
+  if (key !== ROPE.key) { ROPE.key = key; ROPE.start = performance.now(); ROPE.sec = 0; }
+  // Против бота горит только свой фитиль: бот и так ходит быстро
+  if (!mine && !online) { el.hidden = true; return; }
+  const left = TURN_TIME - (performance.now() - ROPE.start) / 1000;
+  if (left > ROPE_TIME) { el.hidden = true; return; }
+  el.hidden = false;
+  el.classList.toggle("foe", !mine);
+  $("ropeCord").style.width = Math.max(0, left / ROPE_TIME * 100) + "%";
+  const sec = Math.ceil(left);
+  if (mine && sec !== ROPE.sec && sec <= 10 && sec >= 0) { ROPE.sec = sec; SND.play("tick", { last: sec <= 3 }); }
+  if (!NO_MOTION && left > 0) {
+    const r = $("ropeCord").getBoundingClientRect();
+    for (let i = 0; i < 2; i++) spark(r.left, r.top + r.height / 2, { color: pick(["#ffd75a", "#ff8a2a", "#fff0a0"]), max: 160, size: 3, grav: 200 });
+  }
+  if (mine && left <= 0 && humanCanAct()) {
+    game.say("Время хода вышло");
+    onEndTurn();
+  }
+}
+setInterval(ropeTick, 200);
+
 // ---------- Предпросмотр ----------
 function showPreview(id) {
   const c = CARDS[id];
@@ -2986,6 +3181,12 @@ const SND = {
   // ---- Эффекты ----
   fx: {
     ui() { this.tone({ f: 900, f2: 1300, dur: .07, vol: .07, type: "triangle" }); },
+    emote(o) {
+      const f = o.mine ? 660 : 520;
+      this.tone({ f, f2: f * 1.5, dur: .12, vol: .08, type: "triangle" });
+      this.tone({ t: .09, f: f * 1.5, f2: f * 2, dur: .14, vol: .07, type: "triangle" });
+    },
+    tick(o) { this.tone({ f: o.last ? 1500 : 1100, f2: o.last ? 1400 : 1050, dur: .05, vol: o.last ? .12 : .08, type: "square" }); },
     card() {
       this.noise({ type: "bandpass", f: 500, f2: 3200, dur: .38, vol: .22, q: 1.2 });
       this.tone({ type: "triangle", f: 320, f2: 760, dur: .3, vol: .06 });
@@ -4889,9 +5090,22 @@ $("game").addEventListener("mouseover", e => {
   if (el) showPreview(el.dataset.card);
 });
 
+$("emoteBtn").addEventListener("click", e => { e.stopPropagation(); if ($("emoteMenu").hidden) openEmotes(); else closeEmotes(); });
+$("emoteMenu").addEventListener("click", e => {
+  e.stopPropagation();
+  const b = e.target.closest("[data-emote]");
+  if (!b) return;
+  if (b.dataset.emote === "mute") { emoteMuted = !emoteMuted; closeEmotes(); document.querySelectorAll(".emote-bubble.foe").forEach(x => x.remove()); return; }
+  sendEmote(b.dataset.emote);
+});
+// Правый клик по своему портрету тоже открывает эмоции, как в Hearthstone
+$("playerBar").addEventListener("contextmenu", e => { if (!e.target.closest(".portrait")) return; e.preventDefault(); openEmotes(); });
+document.addEventListener("click", e => { if (!$("emoteMenu").hidden && !e.target.closest("#emoteMenu")) closeEmotes(); });
+
 document.addEventListener("keydown", e => {
   if (e.key !== "Escape") return;
-  if (!$("tutorial").hidden) closeTutorial();
+  if (!$("emoteMenu").hidden) { closeEmotes(); $("emoteBtn").focus(); }
+  else if (!$("tutorial").hidden) closeTutorial();
   else if (mode !== "idle") { resetMode(); render(); }
 });
 
@@ -4902,7 +5116,11 @@ document.addEventListener("pointerdown", () => SND.unlock(), true);
 document.addEventListener("keydown", () => SND.unlock(), true);
 $("sndBtn").addEventListener("click", () => SND.toggle());
 $("cancelBtn").addEventListener("click", () => { resetMode(); render(); });
-$("againBtn").addEventListener("click", () => { const next = goNext; goNext = null; $("gameover").hidden = true; (next || showSelect)(); });
+$("menuBtn").addEventListener("click", showSelect);
+$("againBtn").addEventListener("click", () => {
+  if (online && game && game.over && !NET.foeLeft) { requestRematch(); return; }
+  const next = goNext; goNext = null; $("gameover").hidden = true; (next || showSelect)();
+});
 $("shareBtn").addEventListener("click", () => {
   const done = () => { $("shareBtn").textContent = "Скопировано"; };
   try { navigator.clipboard.writeText(dailyShare).then(done, () => { $("goSub").textContent = dailyShare; }); }
